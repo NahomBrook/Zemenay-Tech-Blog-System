@@ -1,11 +1,10 @@
 import React from 'react';
+import About from '@/components/about/about';
 
-const AboutPage = () => {
-	return (
-		<main>
-			<h1>About Page</h1>
-		</main>
-	);
-};
-
-export default AboutPage;
+export default function AboutPage() {
+  return (
+    <main className="min-h-screen pt-16"> 
+      <About />
+    </main>
+  );
+}
