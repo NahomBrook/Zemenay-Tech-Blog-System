@@ -683,7 +683,7 @@ const Landing = () => {
                   <div key={i} className="w-8 h-8 rounded-full bg-primary/10 border-2 border-background"></div>
                 ))}
               </div>
-              <span className="text-sm text-muted-foreground">Join 10,000+ developers in our community</span>
+              <span className="text-sm text-muted-foreground">Join 100+ developers in our community</span>
             </div>
           </div>
         </div>
@@ -697,7 +697,7 @@ const Landing = () => {
               Ready to level up your <span className="text-primary">tech journey</span>?
             </h2>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Join our community of 10,000+ developers and get access to exclusive resources, tutorials, and a supportive network.
+              Join our community of 100+ developers and get access to exclusive resources, tutorials, and a supportive network.
             </p>
             
             <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">

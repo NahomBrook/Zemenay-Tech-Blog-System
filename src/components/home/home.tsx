@@ -126,23 +126,6 @@ const mockFeed = [
   },
 ];
 
-const recommendedArticles = [
-  {
-    id: 3,
-    title: 'TypeScript Best Practices',
-    excerpt: 'Advanced TypeScript patterns you should know',
-    category: 'TypeScript',
-    readTime: '6 min read',
-  },
-  {
-    id: 4,
-    title: 'CSS Grid vs Flexbox',
-    excerpt: 'When to use each layout system in your projects',
-    category: 'CSS',
-    readTime: '4 min read',
-  },
-];
-
 // Animation variants
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
