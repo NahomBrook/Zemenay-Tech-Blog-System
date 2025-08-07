@@ -1,8 +1,102 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { motion, useAnimation, useInView } from 'framer-motion';
 import { ArrowRight, BookOpen, Code, Users, MessageSquare, Zap, Layout, UserPlus, Share2, Star, Sparkles, CheckCircle } from 'lucide-react';
 
+// Animation variants
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+};
+
+const FeatureCard = ({ icon, title, description }) => (
+  <motion.div 
+    variants={item}
+    className="group relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:bg-gradient-to-br hover:from-card/90 hover:to-card/70"
+    whileHover={{ scale: 1.02 }}
+  >
+    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <div className="relative z-10">
+      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </div>
+      <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+        {title}
+      </h3>
+      <p className="text-muted-foreground">
+        {description}
+      </p>
+    </div>
+  </motion.div>
+);
+
+const StepCard = ({ number, icon, title, description }) => (
+  <motion.div 
+    variants={item}
+    className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg group"
+    whileHover={{ y: -5 }}
+  >
+    <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg">
+      {number}
+    </div>
+    <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+      {icon}
+    </div>
+    <h3 className="text-xl font-semibold text-foreground mb-2">
+      {title}
+    </h3>
+    <p className="text-muted-foreground">
+      {description}
+    </p>
+  </motion.div>
+);
+
+const TestimonialCard = ({ name, role, content, avatar }) => (
+  <motion.div 
+    variants={item}
+    className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg h-full"
+    whileHover={{ y: -5 }}
+  >
+    <div className="flex items-center mb-4">
+      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/30 flex items-center justify-center text-primary mr-4">
+        {name.charAt(0)}
+      </div>
+      <div>
+        <h4 className="font-medium text-foreground">{name}</h4>
+        <p className="text-sm text-muted-foreground">{role}</p>
+      </div>
+    </div>
+    <p className="text-muted-foreground">"{content}"</p>
+    <div className="flex mt-4 text-amber-400">
+      {[...Array(5)].map((_, i) => (
+        <Star key={i} className="w-4 h-4 fill-current" />
+      ))}
+    </div>
+  </motion.div>
+);
+
 const Landing = () => {
+  const controls = useAnimation();
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start('show');
+    }
+  }, [controls, isInView]);
   // Features data
   const features = [
     { icon: <BookOpen className="h-8 w-8 text-blue-600" />, title: 'Quality Content', description: 'In-depth articles and tutorials on the latest technologies and trends.' },
@@ -30,34 +124,75 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-gradient-to-br from-primary/10 via-background to-background rounded-full blur-3xl opacity-30" />
+      </div>
+
       {/* Hero Section */}
-      <section className="py-20 md:py-32 bg-background border-b border-border">
-        <div className="container mx-auto px-4 text-center">
-          <div className="inline-block px-4 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-full mb-6">
+      <motion.section 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative py-20 md:py-32 overflow-hidden"
+      >
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="inline-flex items-center px-4 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-full mb-6 border border-primary/10 backdrop-blur-sm"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
             Welcome to Zemenay Tech
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70"
+          >
             Empowering Developers <br />
-            <span className="text-primary">Through Knowledge</span>
-          </h1>
-          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text">
+              Through Knowledge
+            </span>
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
+          >
             Discover the latest in technology, programming, and innovation. 
             Join our community of tech enthusiasts and stay ahead of the curve.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          </motion.p>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex flex-col sm:flex-row justify-center gap-4"
+          >
             <Link 
-              href="/get-started" 
-              className="px-8 py-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+              href="/auth/signup" 
+              className="relative group px-8 py-4 bg-gradient-to-r from-primary to-primary/90 text-white rounded-xl font-medium overflow-hidden transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-primary/20"
             >
-              Get Started for Free
+              <span className="relative z-10 flex items-center justify-center">
+                Get Started
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
             <Link 
-              href="/about" 
-              className="px-8 py-4 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all duration-300"
+              href="/" 
+              className="px-8 py-4 border border-border/50 bg-background/50 backdrop-blur-sm text-foreground rounded-xl font-medium hover:bg-accent/50 hover:border-accent/50 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Learn More →
+              Learn More
             </Link>
-          </div>
+          </motion.div>
           <div className="mt-12 flex justify-center">
             <div className="relative w-full max-w-4xl h-64 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl overflow-hidden shadow-inner">
               <div className="absolute inset-0 flex items-center justify-center">
@@ -72,127 +207,147 @@ const Landing = () => {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
+
+      {/* Animated grid pattern */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+      </div>
 
       {/* Features Section */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+        </div>
+        
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Everything You Need to Succeed
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center px-4 py-1.5 text-sm font-medium text-primary/80 bg-primary/5 rounded-full mb-4 border border-primary/10">
+              <Zap className="w-4 h-4 mr-2" />
+              Powerful Features
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+              Why Choose Zemenay Tech?
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our platform provides all the tools and resources to help you grow as a developer.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              We provide the best resources and community for tech enthusiasts.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          </motion.div>
+          
+          <motion.div 
+            ref={ref}
+            variants={container}
+            initial="hidden"
+            animate={controls}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {features.map((feature, index) => (
-              <div 
+              <FeatureCard 
                 key={index}
-                className="group bg-card p-8 rounded-xl border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="w-14 h-14 flex items-center justify-center bg-primary/10 rounded-xl text-primary mb-6 group-hover:bg-primary/20 transition-colors duration-300">
-                  {React.cloneElement(feature.icon, { className: 'h-8 w-8' })}
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-                <div className="mt-4">
-                  <span className="inline-flex items-center text-primary font-medium text-sm">
-                    Learn more
-                    <ArrowRight className="ml-1 w-4 h-4" />
-                  </span>
-                </div>
-              </div>
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+              />
             ))}
-          </div>
-
-          <div className="mt-16 text-center">
-            <Link 
-              href="/features" 
-              className="inline-flex items-center px-6 py-3 border border-border text-foreground font-medium rounded-lg hover:bg-accent transition-colors duration-300"
-            >
-              View all features
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      <section className="relative py-20 bg-gradient-to-b from-background to-muted/20">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+        </div>
+        
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center px-4 py-1.5 text-sm font-medium text-primary/80 bg-primary/5 rounded-full mb-4 border border-primary/10">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Simple Steps
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
               How It Works
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Get started in just a few simple steps
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Get started in just a few simple steps.
             </p>
-          </div>
+          </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <motion.div 
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
             {steps.map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-white font-bold text-xl">{step.number}</span>
-                </div>
-                <div className="bg-muted p-6 rounded-xl shadow-sm h-full">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    {step.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-600">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
+              <StepCard 
+                key={index}
+                number={step.number}
+                icon={step.icon}
+                title={step.title}
+                description={step.description}
+              />
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 md:py-24 bg-background">
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+        </div>
+        
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Loved by Developers Worldwide
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center px-4 py-1.5 text-sm font-medium text-primary/80 bg-primary/5 rounded-full mb-4 border border-primary/10">
+              <Users className="w-4 h-4 mr-2" />
+              Community Voices
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+              What Our Community Says
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of developers who have accelerated their learning journey with us.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of developers who are already part of our community.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          </motion.div>
+          
+          <motion.div 
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
             {testimonials.map((testimonial, index) => (
-              <div 
+              <TestimonialCard 
                 key={index}
-                className="group bg-card p-8 rounded-xl border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="flex items-center mb-6">
-                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-xl group-hover:bg-primary/20 transition-colors duration-300">
-                    {testimonial.name.charAt(0)}
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                </div>
-                <div className="flex mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <blockquote className="text-muted-foreground leading-relaxed italic">
-                  "{testimonial.content}"
-                </blockquote>
-              </div>
+                name={testimonial.name}
+                role={testimonial.role}
+                content={testimonial.content}
+                avatar={testimonial.avatar}
+              />
             ))}
-          </div>
-
+          </motion.div>
           <div className="mt-16 text-center">
             <div className="inline-flex items-center justify-center space-x-4 bg-muted/50 py-3 px-6 rounded-full mx-auto">
               <div className="flex -space-x-2">
