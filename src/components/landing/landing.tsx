@@ -120,13 +120,13 @@ const Landing = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               How It Works
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Get started in just a few simple steps
             </p>
           </div>
@@ -137,7 +137,7 @@ const Landing = () => {
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-white font-bold text-xl">{step.number}</span>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm h-full">
+                <div className="bg-muted p-6 rounded-xl shadow-sm h-full">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                     {step.icon}
                   </div>
