@@ -1,1 +1,2 @@
-# Zemenay-Tech-Blog-System
+# template-repo
+template for access
