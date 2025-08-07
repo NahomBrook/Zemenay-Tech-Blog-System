@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "@/utils/theme-provider";
 import { Inter } from 'next/font/google';
+import { ThemeProvider } from "@/utils/theme-provider";
 import { NavbarSwitcher } from "@/components/NavbarSwitcher";
 import { Footer } from "@/components/footer";
 import "./globals.css";
@@ -17,9 +17,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  // The footer will be conditionally rendered in the page components
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>

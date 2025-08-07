@@ -187,7 +187,7 @@ const Landing = () => {
               <span className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
             <Link 
-              href="/" 
+              href="/auth/signup" 
               className="px-8 py-4 border border-border/50 bg-background/50 backdrop-blur-sm text-foreground rounded-xl font-medium hover:bg-accent/50 hover:border-accent/50 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg"
             >
               Learn More
