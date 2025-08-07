@@ -16,7 +16,7 @@ const mockGamesData = [
       rating: 4.1, // Rating from Play Store (approx)
       downloads: '1K+', // Downloads from Play Store (approx)
       description: 'Help Senzero navigate obstacles in this 3D runner game and have a blast!',
-      imageUrl: '', // CREATE THIS IMAGE
+      imageUrl: '/assets/images/games/run-senzero.webp', // CREATE THIS IMAGE
       genre: 'action', // Or 'casual'
     },
     {
@@ -26,8 +26,9 @@ const mockGamesData = [
       developer: 'BinaryAbyssinia',
       rating: 4.0, // Rating from Play Store (approx)
       downloads: '10K+', // Downloads from Play Store (approx)
-      description: 'Calling all Ethiopians who love logo trivia guessing games - this one is for you! Ethio Logo Quiz Game: Guess Ethiopian and Others Famous Brand Quiz Game is here to test your knowledge. Can you guess the names of hundreds of popular logos from Ethiopia and around the globe? With the largest collection of logos from Ethiopia, this game is sure to keep you entertained for hours!',
-      imageUrl: '', // CREATE THIS IMAGE
+      description: 'Calling all Ethiopians who love logo trivia guessing games - this one is for you! Ethio Logo Quiz Game: Guess Ethiopian and Others Famous Brand Quiz Game is here to test your knowledge. Can you guess the names of hundreds of popular logos from Ethiopia and around the globe? With the largest collection of logos from Ethiopia, this game is sure to keep you entertained for hours!'
+,
+      imageUrl: '/assets/images/games/ethio-logo-quiz.webp', // CREATE THIS IMAGE
       genre: 'puzzle', // Or 'trivia'
     },
     {
@@ -38,7 +39,7 @@ const mockGamesData = [
       rating: 4.6, // Rating from Play Store (approx)
       downloads: '10K+', // Downloads from Play Store (approx)
       description: "Ethiopian Ge'ez Numbers Mobile Puzzle Game To Train Your Brain and Learn Ge'ez Numbers while having fun. Play now this merge the Ge'ez Numbers to beat your best score or others in the online leaderboard.",
-      imageUrl: '', // CREATE THIS IMAGE
+      imageUrl: '/assets/images/games/geez-plus.webp', // CREATE THIS IMAGE
       genre: 'educational', // Or 'puzzle'
     },
     {
@@ -49,7 +50,7 @@ const mockGamesData = [
       rating: 4.4, // Rating from Play Store (approx)
       downloads: '10K+', // Downloads from Play Store (approx)
       description: 'Discover the Ultimate Amharic Word Puzzle Adventure!<br><br>Dive into &quot;Amharic Jumbled Words,&quot; the perfect game for fans of Ethiopian Amharic language and word search games. With over 1000 words across 37 challenging levels, this game offers endless fun and educational value.',
-      imageUrl: '', // CREATE THIS IMAGE
+      imageUrl: '/assets/images/games/amharic-jumbled2.webp', // CREATE THIS IMAGE
       genre: 'puzzle', // Or 'word'
     },
     {
@@ -60,7 +61,7 @@ const mockGamesData = [
       rating: 4.0, // Rating from Play Store (approx)
       downloads: '1K+', // Downloads from Play Store (approx)
       description: 'Test your reflexes controlling a ball on a zigzag path.',
-      imageUrl: '', // CREATE THIS IMAGE
+      imageUrl: '/images/games/zigzag-survival.webp', // CREATE THIS IMAGE
       genre: 'arcade', // Or 'action'
     },
     // Keep previous relevant mock data if desired, or add more real ones
@@ -72,7 +73,7 @@ const mockGamesData = [
       rating: 4.9,
       downloads: '100K+',
       description: 'Modern take on the traditional Ethiopian board game.',
-      imageUrl: '', // Use existing image path
+      imageUrl: '/images/games/gebeta-master.webp', // Use existing image path
       genre: 'puzzle',
     },
      {
@@ -83,7 +84,7 @@ const mockGamesData = [
       rating: 4.8,
       downloads: '80K+',
       description: 'Learn Amharic while solving puzzles with words.', // Slightly different description
-      imageUrl: '', // Use existing image path
+      imageUrl: '/images/games/amharic-word.webp', // Use existing image path
       genre: 'puzzle',
     },
   ];

@@ -8,8 +8,20 @@ import { ArrowRight } from 'lucide-react'; // Or any other icon if needed
 const HeroSection = () => {
   return (
     <section className="relative bg-background text-foreground pt-24 pb-16 md:pt-32 md:pb-24 lg:pt-40 lg:pb-32 overflow-hidden">
-      {/* Gradient Background */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-background via-background/90 to-primary/5" />
+      {/* Optional: Background Image/Graphic Element */}
+      {/* Example: Full bleed background image */}
+      <div className="absolute inset-0 z-0 opacity-10 md:opacity-20">
+        <Image
+          src="/images/hero/home-hero-bg.webp" // CREATE THIS IMAGE in public/images/hero/
+          alt="Abstract gaming background"
+          layout="fill"
+          objectFit="cover"
+          priority // Prioritize loading for LCP element
+          quality={80}
+        />
+        {/* Overlay to darken the image if needed */}
+        <div className="absolute inset-0 bg-black/50"></div>
+      </div>
 
       <div className="container mx-auto px-6 relative z-10 text-center">
         {/* Main Title */}

@@ -22,9 +22,15 @@ export function Navbar() {
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b pl-5 pr-5">
       <div className="container flex items-center justify-between py-4">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Zemenay
-          </span>
+          <div className="relative w-9 h-9">
+            <Image
+              src="/assets/images/EGA_logo.png"
+              alt="Company Logo"
+              layout="fill"
+              objectFit="contain"
+              className="rounded-full"
+            />
+          </div>
         </Link>
         <div className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
