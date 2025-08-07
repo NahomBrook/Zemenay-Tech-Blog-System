@@ -4,8 +4,8 @@ import React from 'react';
 export const mockNewsItems = [
 	{
 		id: 1,
-		slug: 'ega-launches-new-developer-grant',
-		title: 'EGA Launches New Developer Grant Program',
+		slug: 'zemenay-launches-new-developer-grant',
+		title: 'Zemenay Launches New Developer Grant Program',
 		date: 'July 15, 2024',
 		excerpt:
 			'Supporting upcoming Ethiopian game developers with funding and mentorship...',
