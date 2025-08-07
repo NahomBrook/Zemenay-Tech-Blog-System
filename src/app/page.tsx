@@ -92,7 +92,7 @@ const mockTestimonials = [
 			"EGA has been instrumental in connecting me with other developers and providing resources I wouldn't have found otherwise.",
 		name: 'Abebe B.',
 		role: 'Indie Game Developer',
-		avatarUrl: '/images/avatars/avatar-1.webp',
+		avatarUrl: '',
 	},
 	{
 		id: 2,
@@ -100,7 +100,7 @@ const mockTestimonials = [
 			"The tournaments organized by EGA are top-notch! It's a great platform for competitive gamers in Ethiopia.",
 		name: 'Sara G.',
 		role: 'Pro Gamer',
-		avatarUrl: '/images/avatars/avatar-2.webp',
+		avatarUrl: '',
 	},
 	{
 		id: 3,
@@ -108,7 +108,7 @@ const mockTestimonials = [
 			"As a partner, we've seen firsthand the passion and growth within the Ethiopian gaming community thanks to EGA's efforts.",
 		name: 'Ethio Telecom Gaming',
 		role: 'Sponsor',
-		avatarUrl: '/images/avatars/avatar-3.webp',
+		avatarUrl: '',
 	},
 ];
 export type TestimonialType = (typeof mockTestimonials)[0];
@@ -118,18 +118,18 @@ const mockPartnerLogos = [
 	{
 		id: 1,
 		name: 'Efuye Gela',
-		logoUrl: '/assets/images/partners/efuye_gela.png',
+		logoUrl: '',
 	},
 	{
 		id: 2,
 		name: 'Chewata Awaqi',
-		logoUrl: '/assets/images/partners/chewata_awaqi.png',
+		logoUrl: '',
 	},
 	
 	{
 		id: 3,
 		name: 'Busara',
-		logoUrl: '/assets/images/partners/busara.webp',
+		logoUrl: '',
 	},
 	
 	
