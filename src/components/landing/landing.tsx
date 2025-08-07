@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BookOpen, Code, Users, MessageSquare, Zap, Layout, UserPlus, Share2, Star } from 'lucide-react';
+import { ArrowRight, BookOpen, Code, Users, MessageSquare, Zap, Layout, UserPlus, Share2, Star, Sparkles, CheckCircle } from 'lucide-react';
 
 const Landing = () => {
   // Features data
@@ -30,38 +30,244 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-900 to-indigo-900 text-white py-20 md:py-28 lg:py-36">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 to-indigo-900/90"></div>
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Welcome to <span className="text-blue-300">Zemenay Tech Blog</span>
-            </h1>
-            <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              Discover, share, and connect with the latest in technology, development, and innovation in Ethiopia's tech community.
-            </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/signup">
-              <Button className="bg-white text-blue-900 hover:bg-blue-50 px-8 py-6 text-lg font-semibold rounded-lg transition-all transform hover:scale-105">
-                Get Started <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+      <section className="py-20 md:py-32 bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4 text-center">
+          <div className="inline-block px-4 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-full mb-6">
+            Welcome to Zemenay Tech
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Empowering Developers <br />
+            <span className="text-blue-600">Through Knowledge</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Discover the latest in technology, programming, and innovation. 
+            Join our community of tech enthusiasts and stay ahead of the curve.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link 
+              href="/get-started" 
+              className="px-8 py-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+            >
+              Get Started for Free
             </Link>
-            <Link href="/blog">
-              <Button variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg font-semibold rounded-lg">
-                Explore Articles
-              </Button>
+            <Link 
+              href="/about" 
+              className="px-8 py-4 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all duration-300"
+            >
+              Learn More →
+            </Link>
+          </div>
+          <div className="mt-12 flex justify-center">
+            <div className="relative w-full max-w-4xl h-64 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl overflow-hidden shadow-inner">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-8">
+                  <div className="inline-flex items-center text-sm font-medium text-blue-600 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-4 shadow-sm">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Trusted by 10,000+ developers
+                  </div>
+                  <p className="text-gray-500">Join our growing community of tech enthusiasts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Everything You Need to Succeed
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Our platform provides all the tools and resources to help you grow as a developer.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="group bg-white p-8 rounded-xl border border-gray-100 hover:border-blue-100 transition-all duration-300 hover:shadow-lg"
+              >
+                <div className="w-14 h-14 flex items-center justify-center bg-blue-50 rounded-xl text-blue-600 mb-6 group-hover:bg-blue-100 transition-colors duration-300">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <div className="mt-4">
+                  <span className="inline-flex items-center text-blue-600 font-medium text-sm">
+                    Learn more
+                    <ArrowRight className="ml-1 w-4 h-4" />
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <Link 
+              href="/features" 
+              className="inline-flex items-center px-6 py-3 border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors duration-300"
+            >
+              View all features
+              <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Get started in just a few simple steps
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((step, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-white font-bold text-xl">{step.number}</span>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm h-full">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    {step.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-600">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Loved by Developers Worldwide
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Join thousands of developers who have accelerated their learning journey with us.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index}
+                className="group bg-white p-8 rounded-xl border border-gray-100 hover:border-blue-100 transition-all duration-300 hover:shadow-lg"
+              >
+                <div className="flex items-center mb-6">
+                  <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-semibold text-xl group-hover:bg-blue-100 transition-colors duration-300">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
+                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  </div>
+                </div>
+                <div className="flex mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <blockquote className="text-gray-600 leading-relaxed">
+                  "{testimonial.content}"
+                </blockquote>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <div className="inline-flex items-center space-x-4">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="w-10 h-10 rounded-full bg-blue-50 border-2 border-white"></div>
+                ))}
+              </div>
+              <span className="text-sm text-gray-500">Join 10,000+ developers in our community</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 md:py-28 bg-gradient-to-br from-blue-50 to-indigo-50 border-t border-gray-100">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Ready to level up your <span className="text-blue-600">tech journey</span>?
+            </h2>
+            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Join our community of 10,000+ developers and get access to exclusive resources, tutorials, and a supportive network.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
+              <Link 
+                href="/auth/signup" 
+                className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+              >
+                Get Started for Free
+              </Link>
+              <Link 
+                href="/about" 
+                className="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-lg font-medium hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow"
+              >
+                Learn More
+              </Link>
+            </div>
+            
+            <div className="mt-8 flex items-center justify-center space-x-2 text-sm text-gray-500">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>No credit card required</span>
+              <span className="text-gray-300 mx-2">•</span>
+              <span>7-day free trial</span>
+              <span className="text-gray-300 mx-2">•</span>
+              <span>Cancel anytime</span>
+            </div>
+            
+            <div className="mt-12 pt-8 border-t border-gray-100">
+              <div className="flex flex-wrap items-center justify-center gap-6">
+                <div className="flex items-center">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white"></div>
+                    ))}
+                  </div>
+                  <div className="ml-3 text-left">
+                    <div className="text-sm text-gray-500">Trusted by developers at</div>
+                    <div className="flex items-center space-x-1">
+                      {['Google', 'Microsoft', 'Amazon', 'Netflix'].map((company, i) => (
+                        <span key={i} className="text-sm font-medium text-gray-700">
+                          {company}{i < 3 ? ',' : ''}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
+    
   );
 };
 
