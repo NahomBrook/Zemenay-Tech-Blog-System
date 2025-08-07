@@ -24,7 +24,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, className }) => {
   } = game;
 
   // Fallback image if specific one fails or isn't provided
-  const imagePath = imageUrl || '/images/games/placeholder-game.webp';
+  const imagePath = imageUrl || '';
 
   return (
     // Card container - Consider if the whole card should link or just buttons
@@ -51,7 +51,6 @@ const GameCard: React.FC<GameCardProps> = ({ game, className }) => {
             // Optional: hide image container on error, showing only placeholder
             // e.currentTarget.style.opacity = '0'; // Example: hide image, keeps placeholder visible
             e.currentTarget.parentElement?.querySelector('div')?.classList.remove('hidden'); // Show text placeholder if needed
-            e.currentTarget.src = '/images/games/placeholder-game.webp'; // Try loading placeholder
           }}
           onLoad={(e) => {
             // Hide text placeholder on successful load
