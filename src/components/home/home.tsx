@@ -2,19 +2,100 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bookmark, Clock, Flame, History, LayoutGrid, MessageSquare, Search, Settings, ThumbsUp, TrendingUp, BookOpen, Tag } from 'lucide-react';
+import { Bookmark, Clock, Flame, History, LayoutGrid, MessageSquare, Search, Settings, ThumbsUp, TrendingUp, BookOpen, Tag, Mail, ArrowRight, Calendar, User, Code, Image as ImageIcon, Video as VideoIcon, FileText, Link2, X } from 'lucide-react';
+import NextJsImage from '@/assets/images/Nextjs.gif';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
-// Quick actions for the home page
-const quickActions = [
-  { label: 'New Post', icon: <LayoutGrid className="h-5 w-5" />, path: '/new-post' },
-  { label: 'Bookmarks', icon: <Bookmark className="h-5 w-5" />, path: '/bookmarks' },
-  { label: 'Drafts', icon: <Settings className="h-5 w-5" />, path: '/drafts' },
-  { label: 'History', icon: <History className="h-5 w-5" />, path: '/history' }
+// Categories for the blog
+//TODO: Data will be fetched from the backend after integration
+const categories = [
+  { name: 'Web Development', icon: <Code className="h-4 w-4" />, count: 24 },
+  { name: 'Mobile', icon: <LayoutGrid className="h-4 w-4" />, count: 15 },
+  { name: 'UI/UX', icon: <BookOpen className="h-4 w-4" />, count: 18 },
+  { name: 'DevOps', icon: <Settings className="h-4 w-4" />, count: 12 },
+  { name: 'Data Science', icon: <TrendingUp className="h-4 w-4" />, count: 20 }
+];
+
+// Featured post
+const featuredPost = {
+  id: 0,
+  title: 'Mastering Next.js 14: A Comprehensive Guide',
+  excerpt: 'Discover the latest features and best practices for building modern web applications with Next.js 14.',
+  author: 'Sarah Johnson',
+  date: '1d ago',
+  readTime: '8 min read',
+  category: 'Web Development',
+  likes: 42,
+  comments: 15,
+  isBookmarked: true,
+  image: NextJsImage
+};
+
+// Featured Authors
+//TODO: Data will be fetched from the backend after integration
+const featuredAuthors = [
+  {
+    id: 1,
+    name: 'Sarah Johnson',
+    role: 'Senior Web Developer',
+    avatar: '/images/avatars/author1.jpg',
+    posts: 42,
+    followers: '12.5k'
+  },
+  {
+    id: 2,
+    name: 'Michael Chen',
+    role: 'UI/UX Designer',
+    avatar: '/images/avatars/author2.jpg',
+    posts: 28,
+    followers: '8.7k'
+  },
+  {
+    id: 3,
+    name: 'Emily Rodriguez',
+    role: 'DevOps Engineer',
+    avatar: '/images/avatars/author3.jpg',
+    posts: 35,
+    followers: '15.2k'
+  }
+];
+
+// Popular Posts
+const popularPosts = [
+  {
+    id: 5,
+    title: 'Building Scalable Microservices with Docker',
+    excerpt: 'Learn how to design and deploy microservices at scale',
+    image: '/images/posts/microservices.jpg',
+    date: '3d ago',
+    readTime: '10 min read',
+    likes: 89,
+    comments: 24
+  },
+  {
+    id: 6,
+    title: 'The Future of React Server Components',
+    excerpt: 'Exploring the next generation of React architecture',
+    image: '/images/posts/react-future.jpg',
+    date: '5d ago',
+    readTime: '7 min read',
+    likes: 124,
+    comments: 42
+  },
+  {
+    id: 7,
+    title: 'Getting Started with WebAssembly',
+    excerpt: 'A practical guide to WebAssembly for web developers',
+    image: '/images/posts/webassembly.jpg',
+    date: '1w ago',
+    readTime: '12 min read',
+    likes: 67,
+    comments: 18
+  }
 ];
 
 // Mock data - replace with actual data from your API
@@ -85,6 +166,30 @@ const staggerContainer = {
 const HomePage = () => {
   const [activeTab, setActiveTab] = useState('trending');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<{ file: File; type: 'image' | 'video' | 'document' | 'link' } | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const videoInputRef = React.useRef<HTMLInputElement>(null);
+  const docInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'document') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedMedia({ file, type });
+    }
+  };
+
+  const openFileDialog = (ref: React.RefObject<HTMLInputElement>) => {
+    ref.current?.click();
+  };
+
+  const handleLinkClick = () => {
+    const url = prompt('Enter the URL you want to share:');
+    if (url) {
+      // Handle the link (you can add validation here)
+      console.log('Shared URL:', url);
+      // You can update the UI to show the shared link
+    }
+  };
 
   const handleTabChange = (tab: string) => {
     setIsLoading(true);
@@ -106,43 +211,214 @@ const HomePage = () => {
       >
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-8">
-          {/* Welcome Section */}
+          {/* Create Post Card */}
           <motion.div 
             variants={fadeIn}
-            className="bg-gradient-to-r from-primary/5 to-primary/10 p-6 rounded-xl border border-border/30 backdrop-blur-sm"
+            className="bg-card rounded-xl border border-border/30 p-4 shadow-sm"
           >
-            <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Welcome back, User! 👋
-            </h1>
-            <p className="text-muted-foreground">Here's what's happening in your feed today</p>
+            <div className="flex items-start gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src="/images/avatars/user.jpg" alt="User" />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <div className="relative
+                  before:absolute before:pointer-events-none before:inset-0 before:rounded-xl before:ring-1 before:ring-inset before:ring-border/30
+                  focus-within:before:ring-primary/50 focus-within:before:ring-2 transition-shadow duration-200
+                ">
+                  <textarea
+                    placeholder="Share your thoughts, ideas, or updates..."
+                    className="w-full min-h-[80px] p-3 bg-transparent rounded-xl border-0 focus:ring-0 resize-none text-foreground placeholder:text-muted-foreground/60"
+                    rows={3}
+                  />
+                </div>
+                
+                {/* Category Selector */}
+                <div className="mt-3 flex items-center gap-2 flex-wrap">
+                  <select 
+                    className="text-sm bg-muted/30 dark:bg-background border border-border/30 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent
+                    dark:text-foreground dark:border-muted-foreground/30 dark:bg-muted/10 dark:focus:ring-primary/70
+                    [&>option]:bg-background [&>option]:text-foreground"
+                    defaultValue=""
+                  >
+                    <option value="" disabled className="text-muted-foreground">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category.name} value={category.name} className="text-foreground">
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Media Buttons */}
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFileChange(e, 'image')}
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="rounded-full text-muted-foreground hover:text-primary"
+                      onClick={() => openFileDialog(fileInputRef)}
+                    >
+                      <ImageIcon className="h-5 w-5" />
+                      <span className="sr-only">Add photo</span>
+                    </Button>
+
+                    <input
+                      type="file"
+                      ref={videoInputRef}
+                      accept="video/*"
+                      className="hidden"
+                      onChange={(e) => handleFileChange(e, 'video')}
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="rounded-full text-muted-foreground hover:text-primary"
+                      onClick={() => openFileDialog(videoInputRef)}
+                    >
+                      <VideoIcon className="h-5 w-5" />
+                      <span className="sr-only">Add video</span>
+                    </Button>
+
+                    <input
+                      type="file"
+                      ref={docInputRef}
+                      accept=".pdf,.doc,.docx,.txt"
+                      className="hidden"
+                      onChange={(e) => handleFileChange(e, 'document')}
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="rounded-full text-muted-foreground hover:text-primary"
+                      onClick={() => openFileDialog(docInputRef)}
+                    >
+                      <FileText className="h-5 w-5" />
+                      <span className="sr-only">Add document</span>
+                    </Button>
+
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className="rounded-full text-muted-foreground hover:text-primary"
+                      onClick={handleLinkClick}
+                    >
+                      <Link2 className="h-5 w-5" />
+                      <span className="sr-only">Add link</span>
+                    </Button>
+                  </div>
+                  <Button className="rounded-full px-6">
+                    Post
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Preview Area */}
+            {selectedMedia && (
+              <div className="mt-4 border-t border-border/20 pt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {selectedMedia.type === 'image' && <ImageIcon className="h-5 w-5 text-primary" />}
+                    {selectedMedia.type === 'video' && <VideoIcon className="h-5 w-5 text-primary" />}
+                    {selectedMedia.type === 'document' && <FileText className="h-5 w-5 text-primary" />}
+                    <span className="text-sm font-medium truncate max-w-[200px]">
+                      {selectedMedia.file.name}
+                    </span>
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => setSelectedMedia(null)}
+                  >
+                    <X className="h-4 w-4" />
+                    <span className="sr-only">Remove</span>
+                  </Button>
+                </div>
+                {selectedMedia.type === 'image' && (
+                  <div className="mt-2 rounded-lg overflow-hidden">
+                    <img 
+                      src={URL.createObjectURL(selectedMedia.file)} 
+                      alt="Preview" 
+                      className="max-h-40 w-auto max-w-full object-cover rounded"
+                    />
+                  </div>
+                )}
+                {selectedMedia.type === 'video' && (
+                  <div className="mt-2 rounded-lg overflow-hidden bg-black/5 dark:bg-white/5">
+                    <video 
+                      src={URL.createObjectURL(selectedMedia.file)}
+                      controls
+                      className="max-h-40 w-full object-contain rounded"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </motion.div>
 
-          {/* Quick Actions */}
+          {/* Hero Section with Featured Post */}
+          <motion.article 
+            variants={fadeIn}
+            className="relative rounded-2xl overflow-hidden group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+            <img 
+              src={featuredPost.image.src} 
+              alt={featuredPost.title}
+              className="w-full h-[400px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
+              <Badge className="mb-4 bg-primary/20 hover:bg-primary/30 text-primary-foreground border-primary/30">
+                Featured Post
+              </Badge>
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-primary-foreground transition-colors">
+                {featuredPost.title}
+              </h1>
+              <p className="text-muted-foreground text-white/90 mb-6 max-w-2xl">
+                {featuredPost.excerpt}
+              </p>
+              <div className="flex items-center gap-4">
+                <Button variant="secondary" className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  Read Article
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Calendar className="h-4 w-4" />
+                  <span>{featuredPost.date}</span>
+                  <span>•</span>
+                  <span>{featuredPost.readTime}</span>
+                </div>
+              </div>
+            </div>
+          </motion.article>
+
+
+          {/* Trending Now */}
           <motion.div 
             variants={fadeIn}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+            className="space-y-4"
           >
-            {quickActions.map((action, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ y: -4, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-              >
-                <Button 
-                  variant="outline" 
-                  className="w-full h-24 flex flex-col items-center justify-center gap-2 hover:bg-accent/20 transition-all duration-300 group"
-                  asChild
-                >
-                  <a href={action.path}>
-                    <span className="text-primary group-hover:scale-110 transition-transform">
-                      {action.icon}
-                    </span>
-                    <span className="text-sm font-medium">{action.label}</span>
-                  </a>
-                </Button>
-              </motion.div>
-            ))}
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Trending Now</h2>
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                See all
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
           </motion.div>
 
           {/* Feed Tabs */}
@@ -151,9 +427,9 @@ const HomePage = () => {
             className="flex items-center border-b border-border/30 pb-2"
           >
             {[
-              { id: 'trending', label: 'Trending', icon: <Flame className="h-4 w-4" /> },
-              { id: 'latest', label: 'Latest', icon: <TrendingUp className="h-4 w-4" /> },
-              { id: 'following', label: 'Following', icon: <History className="h-4 w-4" /> }
+              { id: 'trending', label: 'Trending', icon: <Flame className="h-4 w-4 text-orange-500" /> },
+              { id: 'latest', label: 'Latest', icon: <TrendingUp className="h-4 w-4 text-blue-500" /> },
+              { id: 'following', label: 'Following', icon: <History className="h-4 w-4 text-green-500" /> }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -203,7 +479,7 @@ const HomePage = () => {
                     whileHover={{ y: -2 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                   >
-                    <Card className="overflow-hidden border-border/30 hover:shadow-lg transition-all duration-300 group">
+                    <Card className="overflow-hidden border-border/20 hover:shadow-lg transition-all duration-300 group hover:border-primary/30">
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-3 mb-2">
                           <Avatar className="h-9 w-9 border-2 border-background group-hover:border-primary/30 transition-colors">
@@ -267,7 +543,7 @@ const HomePage = () => {
         {/* Sidebar */}
         <motion.div 
           variants={fadeIn}
-          className="space-y-6"
+          className="space-y-8"
         >
           {/* Search */}
           <motion.div 
@@ -283,122 +559,39 @@ const HomePage = () => {
             />
           </motion.div>
 
-          {/* Recommended Articles */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="border-border/30 overflow-hidden">
-              <CardHeader className="pb-3 border-b border-border/20">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Flame className="h-5 w-5 text-orange-500" />
-                  <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Trending Now
-                  </span>
-                </CardTitle>
-                <CardDescription>Popular articles you might like</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                {recommendedArticles.map((article) => (
-                  <motion.div 
-                    key={article.id}
-                    className="p-4 group cursor-pointer hover:bg-muted/30 transition-colors border-b border-border/20 last:border-b-0"
-                    whileHover={{ x: 4 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="bg-muted/50 rounded-lg p-2 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                        <BookOpen className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
-                          {article.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{article.excerpt}</p>
-                        <div className="flex items-center justify-between mt-2">
-                          <Badge 
-                            variant="outline" 
-                            className="text-xs font-normal bg-muted/30 border-border/30 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:text-primary transition-colors"
-                          >
-                            {article.category}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {article.readTime}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Popular Tags */}
+          {/* Categories */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border-border/30">
+            <Card className="border-border/30 overflow-hidden">
               <CardHeader className="pb-3 border-b border-border/20">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Tag className="h-5 w-5 text-primary" />
-                  <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Popular Tags
-                  </span>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <LayoutGrid className="h-5 w-5 text-primary" />
+                  <span>Categories</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
-                <div className="flex flex-wrap gap-2">
-                  {['React', 'TypeScript', 'Next.js', 'CSS', 'JavaScript', 'Web Development', 'UI/UX', 'Performance'].map((tag) => (
-                    <motion.div
-                      key={tag}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 10 }}
+              <CardContent className="p-0">
+                <div className="divide-y divide-border/30">
+                  {categories.map((category, index) => (
+                    <div 
+                      key={index}
+                      className="px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer flex items-center justify-between group"
                     >
-                      <Badge
-                        variant="outline"
-                        className="px-3 py-1.5 text-xs font-normal bg-muted/30 border-border/30 text-foreground/80 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors cursor-pointer"
-                      >
-                        {tag}
+                      <div className="flex items-center gap-3">
+                        <span className="text-muted-foreground group-hover:text-primary transition-colors">
+                          {category.icon}
+                        </span>
+                        <span className="text-sm font-medium group-hover:text-primary transition-colors">
+                          {category.name}
+                        </span>
+                      </div>
+                      <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+                        {category.count}
                       </Badge>
-                    </motion.div>
+                    </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Newsletter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="border-border/30 bg-gradient-to-br from-primary/5 to-primary/10 backdrop-blur-sm overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <CardHeader className="relative z-10">
-                <CardTitle className="text-lg bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  Stay Updated
-                </CardTitle>
-                <CardDescription className="text-foreground/80">
-                  Get the latest articles and resources sent straight to your inbox.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="relative z-10">
-                <div className="space-y-3">
-                  <Input 
-                    type="email" 
-                    placeholder="Your email address" 
-                    className="bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50"
-                  />
-                  <Button className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary transition-all">
-                    Subscribe
-                  </Button>
                 </div>
               </CardContent>
             </Card>
