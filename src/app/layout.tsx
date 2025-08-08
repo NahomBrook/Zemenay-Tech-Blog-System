@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from 'next/font/google';
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/utils/theme-provider";
 import { NavbarSwitcher } from "@/components/NavbarSwitcher";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
+import Providers from "./providers"; // Client wrapper
 import "./globals.css";
 
 const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -16,23 +17,20 @@ export const metadata: Metadata = {
   description: "Stay ahead with the latest in technology and innovation",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // The footer will be conditionally rendered in the page components
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider>
-          <NavbarSwitcher />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <Toaster />
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider>
+            <NavbarSwitcher />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+            <Toaster />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
