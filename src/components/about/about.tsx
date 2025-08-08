@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 // Create a motion button component
 const MotionButton = motion(Button);
@@ -244,6 +245,7 @@ const AboutPage = () => {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
                 className="gap-2"
+                onClick={() => router.push('/home')}
               >
                 <Code className="h-4 w-4" />
                 Contribute Content
