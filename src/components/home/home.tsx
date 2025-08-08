@@ -9,15 +9,33 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link'; 
 
-// Categories for the blog
-//TODO: Data will be fetched from the backend after integration
+// Popular tags for the blog
+// TODO: Data will be fetched from the backend after integration
+const popularTags = [
+  { name: 'React', count: 42, href: "/tag/react" },
+  { name: 'Next.js', count: 38, href: "/tag/nextjs" },
+  { name: 'TypeScript', count: 35, href: "/tag/typescript" },
+  { name: 'Tailwind CSS', count: 28, href: "/tag/tailwind" },
+  { name: 'Node.js', count: 25, href: "/tag/nodejs" },
+  { name: 'Python', count: 22, href: "/tag/python" },
+  { name: 'Docker', count: 19, href: "/tag/docker" },
+  { name: 'Kubernetes', count: 15, href: "/tag/kubernetes" }
+];
+
+// Blog categories
 const categories = [
-  { name: 'Web Development', icon: <Code className="h-4 w-4" />, count: 24 },
-  { name: 'Mobile', icon: <LayoutGrid className="h-4 w-4" />, count: 15 },
-  { name: 'UI/UX', icon: <BookOpen className="h-4 w-4" />, count: 18 },
-  { name: 'DevOps', icon: <Settings className="h-4 w-4" />, count: 12 },
-  { name: 'Data Science', icon: <TrendingUp className="h-4 w-4" />, count: 20 }
+  { name: 'Web Development' },
+  { name: 'Frontend' },
+  { name: 'Backend' },
+  { name: 'DevOps' },
+  { name: 'Mobile' },
+  { name: 'UI/UX' },
+  { name: 'Database' },
+  { name: 'Cloud' },
+  { name: 'Security' },
+  { name: 'AI/ML' }
 ];
 
 // Featured post
@@ -540,7 +558,7 @@ const HomePage = () => {
             />
           </motion.div>
 
-          {/* Categories */}
+          {/* Popular Tags */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -549,29 +567,22 @@ const HomePage = () => {
             <Card className="border-border/30 overflow-hidden">
               <CardHeader className="pb-3 border-b border-border/20">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <LayoutGrid className="h-5 w-5 text-primary" />
-                  <span>Categories</span>
+                  <Tag className="h-5 w-5 text-primary" />
+                  <span>Popular Tags</span>
                 </CardTitle>
+                <p className="text-sm text-muted-foreground">Browse articles by popular topics</p>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/30">
-                  {categories.map((category, index) => (
-                    <div 
+              <CardContent className="p-4">
+                <div className="flex flex-wrap gap-2">
+                  {popularTags.map((tag, index) => (
+                    <span 
                       key={index}
-                      className="px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer flex items-center justify-between group"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors group"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-muted-foreground group-hover:text-primary transition-colors">
-                          {category.icon}
-                        </span>
-                        <span className="text-sm font-medium group-hover:text-primary transition-colors">
-                          {category.name}
-                        </span>
-                      </div>
-                      <Badge variant="secondary" className="px-2 py-0.5 text-xs">
-                        {category.count}
-                      </Badge>
-                    </div>
+                      <span className="text-foreground group-hover:text-primary transition-colors">
+                        {tag.name}
+                      </span>
+                    </span>
                   ))}
                 </div>
               </CardContent>
