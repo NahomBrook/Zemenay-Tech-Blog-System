@@ -3,13 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion, useAnimation, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { ArrowRight, BookOpen, Code, Users, MessageSquare, Zap, Layout, UserPlus, Share2, Star, Sparkles, CheckCircle, ArrowDown, Github, Twitter, Linkedin, Menu, X } from 'lucide-react';
+import { ArrowRight, BookOpen, Code, Users, MessageSquare, Zap, Layout, UserPlus, Share2, Star, Sparkles, CheckCircle, ArrowDown, Github, Twitter, Linkedin, Menu, X, Code2, Cpu, Database, CpuIcon, Server, Terminal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 // Animation variants
 const container = {
   hidden: { opacity: 0 },
-  show: {
+  show: { 
     opacity: 1,
     transition: {
       staggerChildren: 0.1
@@ -22,71 +22,286 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
 };
 
-const FeatureCard = ({ icon, title, description }) => (
-  <motion.div 
-    variants={item}
-    className="group relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:bg-gradient-to-br hover:from-card/90 hover:to-card/70"
-    whileHover={{ scale: 1.02 }}
-  >
-    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-    <div className="relative z-10">
-      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-        {icon}
+const FeatureCard = ({ icon, title, description, index }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <motion.div 
+      variants={item}
+      className="group relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/20 hover:from-card/90 hover:to-card/70 overflow-hidden"
+      whileHover={{ scale: 1.02 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ delay: index * 0.1, duration: 0.6 }}
+    >
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100"
+        animate={{ 
+          opacity: isHovered ? 1 : 0,
+          scale: isHovered ? 1 : 0.95
+        }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      />
+      <div className="relative z-10">
+        <motion.div 
+          className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300"
+          whileHover={{ 
+            rotate: [0, 5, -5, 5, 0],
+            transition: { duration: 0.8 }
+          }}
+        >
+          {React.cloneElement(icon, {
+            className: `${icon.props.className} transition-transform duration-300 group-hover:scale-125`
+          })}
+        </motion.div>
+        <h3 className="text-xl font-semibold text-foreground dark:text-foreground mb-3 group-hover:text-primary transition-colors">
+          {title}
+          <motion.div 
+            className="h-0.5 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 w-0 group-hover:w-full mt-2"
+            transition={{ duration: 0.6, delay: 0.1 }}
+          />
+        </h3>
+        <p className="text-muted-foreground dark:text-muted-foreground leading-relaxed">
+          {description}
+        </p>
       </div>
-      <h3 className="text-xl font-semibold text-foreground dark:text-foreground mb-2 group-hover:text-primary transition-colors">
-        {title}
-      </h3>
-      <p className="text-muted-foreground dark:text-muted-foreground">
-        {description}
-      </p>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
-const StepCard = ({ number, icon, title, description }) => (
-  <motion.div 
-    variants={item}
-    className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg group"
-    whileHover={{ y: -5 }}
-  >
-    <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg">
-      {number}
+const StepCard = ({ number, icon, title, description, index, totalSteps }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const isLast = index === totalSteps - 1;
+  
+  return (
+    <div className="relative">
+      {/* Timeline connector */}
+      {!isLast && (
+        <div className="absolute left-6 top-12 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 to-transparent" />
+      )}
+      
+      <motion.div 
+        variants={item}
+        className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg group h-full"
+        whileHover={{ y: -5 }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ delay: 0.1 * index, duration: 0.6 }}
+      >
+        {/* Animated number badge */}
+        <motion.div 
+          className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg z-10"
+          animate={{
+            scale: isHovered ? 1.1 : 1,
+            rotate: isHovered ? [0, 10, -10, 0] : 0,
+            boxShadow: isHovered 
+              ? '0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 8px 10px -6px rgba(59, 130, 246, 0.4)' 
+              : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+          }}
+          transition={{
+            scale: { duration: 0.2 },
+            rotate: { duration: 0.6 },
+            boxShadow: { duration: 0.3 }
+          }}
+        >
+          {number}
+        </motion.div>
+        
+        <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+          {React.cloneElement(icon, {
+            className: `${icon.props.className} transition-transform duration-300 group-hover:scale-110`
+          })}
+        </div>
+        
+        <h3 className="text-xl font-semibold text-foreground dark:text-foreground mb-3 flex items-center">
+          {title}
+          <motion.span 
+            className="ml-2 text-primary opacity-0 group-hover:opacity-100"
+            animate={{ 
+              x: isHovered ? [0, 5, 0] : 0,
+              opacity: isHovered ? 1 : 0
+            }}
+            transition={{ 
+              x: { duration: 1, repeat: Infinity },
+              opacity: { duration: 0.3 }
+            }}
+          >
+            →
+          </motion.span>
+        </h3>
+        
+        <p className="text-muted-foreground dark:text-muted-foreground leading-relaxed">
+          {description}
+        </p>
+        
+        {/* Animated border highlight */}
+        <motion.div 
+          className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-primary/20"
+          animate={{
+            borderWidth: isHovered ? 2 : 0,
+            opacity: isHovered ? 1 : 0
+          }}
+          transition={{ duration: 0.3 }}
+        />
+      </motion.div>
     </div>
-    <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-      {icon}
-    </div>
-    <h3 className="text-xl font-semibold text-foreground dark:text-foreground mb-2">
-      {title}
-    </h3>
-    <p className="text-muted-foreground dark:text-muted-foreground">
-      {description}
-    </p>
-  </motion.div>
-);
+  );
+};
 
-const TestimonialCard = ({ name, role, content, avatar }) => (
-  <motion.div 
-    variants={item}
-    className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg h-full"
-    whileHover={{ y: -5 }}
-  >
-    <div className="flex items-center mb-4">
-      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/30 flex items-center justify-center text-primary mr-4">
-        {name.charAt(0)}
+const TestimonialCard = ({ name, role, content, avatar, index }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const controls = useAnimation();
+  
+  const handleHoverStart = () => {
+    setIsHovered(true);
+    controls.start({
+      scale: 1.03,
+      y: -5,
+      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      transition: { duration: 0.3 }
+    });
+  };
+  
+  const handleHoverEnd = () => {
+    setIsHovered(false);
+    controls.start({
+      scale: 1,
+      y: 0,
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      transition: { duration: 0.3 }
+    });
+  };
+  
+  // Animated gradient for the avatar
+  const avatarGradient = {
+    hidden: { backgroundPosition: '0% 50%' },
+    visible: {
+      backgroundPosition: '100% 50%',
+      transition: {
+        duration: 8,
+        repeat: Infinity,
+        repeatType: 'reverse' as const,
+        ease: 'linear'
+      }
+    }
+  };
+
+  return (
+    <motion.div 
+      className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg h-full overflow-hidden"
+      onHoverStart={handleHoverStart}
+      onHoverEnd={handleHoverEnd}
+      animate={controls}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay: 0.1 * index, duration: 0.6 }}
+    >
+      {/* Animated background highlight */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0"
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      />
+      
+      <div className="relative z-10">
+        <div className="flex items-center mb-4">
+          <motion.div 
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4 relative overflow-hidden"
+            variants={avatarGradient}
+            initial="hidden"
+            animate="visible"
+            style={{
+              background: `linear-gradient(90deg, 
+                rgba(59, 130, 246, 0.7) 0%, 
+                rgba(168, 85, 247, 0.7) 50%, 
+                rgba(236, 72, 153, 0.7) 100%)`,
+              backgroundSize: '200% 200%'
+            }}
+          >
+            {name.charAt(0)}
+            <motion.div 
+              className="absolute inset-0 bg-white/10 rounded-full"
+              animate={{ 
+                scale: isHovered ? 1.5 : 1,
+                opacity: isHovered ? 0.3 : 0
+              }}
+              transition={{ duration: 0.5 }}
+            />
+          </motion.div>
+          
+          <div>
+            <h4 className="font-medium text-foreground dark:text-foreground flex items-center">
+              {name}
+              <motion.span 
+                className="ml-2 text-primary text-xs bg-primary/10 px-2 py-0.5 rounded-full"
+                animate={{ 
+                  scale: isHovered ? [1, 1.1, 1] : 1,
+                  rotate: isHovered ? [0, 5, -5, 0] : 0
+                }}
+                transition={{ 
+                  scale: { duration: 0.5 },
+                  rotate: { duration: 0.5 }
+                }}
+              >
+                {role}
+              </motion.span>
+            </h4>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground">Verified Member</p>
+          </div>
+        </div>
+        
+        <motion.p 
+          className="text-foreground dark:text-foreground relative pl-4 border-l-2 border-primary/20"
+          animate={{ 
+            paddingLeft: isHovered ? '1.5rem' : '1rem',
+            borderLeftWidth: isHovered ? '4px' : '2px'
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          <span className="text-3xl font-serif text-primary/30 absolute left-0 -top-2">"</span>
+          {content}
+          <span className="text-3xl font-serif text-primary/30 align-bottom">"</span>
+        </motion.p>
+        
+        <div className="flex mt-4">
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={i}
+              animate={{
+                scale: isHovered ? [1, 1.3, 1] : 1,
+                y: isHovered ? [-2, 2, -2] : 0
+              }}
+              transition={{
+                duration: 0.5,
+                delay: i * 0.1,
+                repeat: isHovered ? Infinity : 0
+              }}
+            >
+              <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+            </motion.div>
+          ))}
+        </div>
       </div>
-      <div>
-        <h4 className="font-medium text-foreground dark:text-foreground">{name}</h4>
-        <p className="text-sm text-muted-foreground dark:text-muted-foreground">{role}</p>
-      </div>
-    </div>
-    <p className="text-foreground dark:text-foreground">"{content}"</p>
-    <div className="flex mt-4 text-amber-400">
-      {[...Array(5)].map((_, i) => (
-        <Star key={i} className="w-4 h-4 fill-current" />
-      ))}
-    </div>
-  </motion.div>
-);
+      
+      {/* Decorative elements */}
+      <motion.div 
+        className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-primary/5"
+        animate={{
+          scale: isHovered ? 1.5 : 1,
+          opacity: isHovered ? 0.8 : 0.3
+        }}
+        transition={{ duration: 0.5 }}
+      />
+    </motion.div>
+  );
+};
 
 // Floating animation for decorative elements
 const floatingAnimation = (i: number) => {
@@ -113,6 +328,34 @@ const Landing = () => {
   const { scrollYProgress } = useScroll();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const [typingComplete, setTypingComplete] = useState(false);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const texts = ['Empowering Developers', 'Building Community', 'Sharing Knowledge'];
+  const [displayText, setDisplayText] = useState('');
+  const [typingForward, setTypingForward] = useState(true);
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const [isClient, setIsClient] = useState(false);
+  
+  // Store random values for consistent rendering between server and client
+  const [randomValues, setRandomValues] = useState({
+    techIcons: Array(5).fill(0).map(() => ({
+      size: 30 + Math.random() * 30,
+      delay: Math.random() * 5,
+      duration: 15 + Math.random() * 10,
+      x: Math.random() * 100,
+      y: Math.random() * 100
+    })),
+    particles: Array(20).fill(0).map(() => ({
+      width: 2 + Math.random() * 10,
+      height: 2 + Math.random() * 10,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 5 + Math.random() * 10,
+      delay: Math.random() * 5,
+      x: (Math.random() * 100) - 50,
+      y: -50
+    }))
+  });
 
   const y1 = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const y2 = useTransform(scrollYProgress, [0, 1], [0, 200]);
@@ -150,7 +393,56 @@ const Landing = () => {
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    setIsClient(true);
+    
+    // Only update random values on client side
+    if (typeof window !== 'undefined') {
+      setRandomValues({
+        techIcons: Array(5).fill(0).map(() => ({
+          size: 30 + Math.random() * 30,
+          delay: Math.random() * 5,
+          duration: 15 + Math.random() * 10,
+          x: Math.random() * 100,
+          y: Math.random() * 100
+        })),
+        particles: Array(20).fill(0).map(() => ({
+          width: 2 + Math.random() * 10,
+          height: 2 + Math.random() * 10,
+          left: Math.random() * 100,
+          top: Math.random() * 100,
+          duration: 5 + Math.random() * 10,
+          delay: Math.random() * 5,
+          x: (Math.random() * 100) - 50,
+          y: -50
+        }))
+      });
+    }
+    
+    // Typing effect
+    const typeText = () => {
+      const currentText = texts[currentTextIndex];
+      
+      if (typingForward) {
+        if (currentCharIndex < currentText.length) {
+          setDisplayText(currentText.substring(0, currentCharIndex + 1));
+          setCurrentCharIndex(currentCharIndex + 1);
+        } else {
+          setTimeout(() => setTypingForward(false), 2000);
+        }
+      } else {
+        if (currentCharIndex > 0) {
+          setDisplayText(currentText.substring(0, currentCharIndex - 1));
+          setCurrentCharIndex(currentCharIndex - 1);
+        } else {
+          setTypingForward(true);
+          setCurrentTextIndex((currentTextIndex + 1) % texts.length);
+        }
+      }
+    };
+    
+    const timer = setTimeout(typeText, typingForward ? 100 : 50);
+    return () => clearTimeout(timer);
+  }, [currentCharIndex, currentTextIndex, typingForward]);
 
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
@@ -194,6 +486,70 @@ const Landing = () => {
         <div className="absolute inset-0 bg-grid-white/[0.02]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-[size:20px_20px] opacity-5" />
+        
+        {/* Animated Tech Icons */}
+        {isClient && [
+          { icon: Code2 },
+          { icon: Cpu },
+          { icon: Database },
+          { icon: Server },
+          { icon: Terminal }
+        ].map(({ icon: Icon }, i) => {
+          const { size, delay, duration, x, y } = randomValues.techIcons[i] || {};
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute text-primary/10 dark:text-primary/5"
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+                fontSize: `${size}px`
+              }}
+              animate={{
+                y: [0, -50, 0],
+                rotate: [0, 180, 360],
+                opacity: [0.2, 0.5, 0.2]
+              }}
+              transition={{
+                duration: duration,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: delay,
+                repeatType: 'reverse' as const
+              }}
+            >
+              <Icon className="w-8 h-8" />
+            </motion.div>
+          );
+        })}
+        
+        {/* Floating Particles */}
+        {isClient && randomValues.particles.map((particle, i) => (
+          <motion.div
+            key={`particle-${i}`}
+            className="absolute rounded-full bg-primary/10 dark:bg-primary/5"
+            style={{
+              width: `${particle.width}px`,
+              height: `${particle.height}px`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
+            }}
+            animate={{
+              y: [0, particle.y, 0],
+              x: [0, particle.x, 0],
+              opacity: [0.2, 0.8, 0.2],
+              scale: [1, 1.5, 1]
+            }}
+            transition={{
+              duration: particle.duration,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: particle.delay,
+              repeatType: 'reverse' as const
+            }}
+          />
+        ))}
         
         {/* Animated floating elements */}
         <motion.div 
@@ -315,8 +671,8 @@ const Landing = () => {
               <span>Join our growing community</span>
             </motion.div>
 
-            <motion.h1 
-              className="text-4xl md:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80 mb-6 leading-tight"
+            <motion.div 
+              className="relative min-h-[200px] md:min-h-[250px] lg:min-h-[300px] flex flex-col justify-center"
               variants={{
                 hidden: { opacity: 0, y: 30 },
                 visible: {
@@ -329,21 +685,53 @@ const Landing = () => {
                 }
               }}
             >
-              <motion.span 
-                className="block"
+              <motion.div 
+                className="text-4xl md:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80 leading-tight"
                 custom={0}
                 variants={textReveal}
               >
-                Empowering Developers
-              </motion.span>
-              <motion.span 
-                className="inline-block mt-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text"
+                {displayText}
+                <motion.span 
+                  className="inline-block w-1 h-16 bg-primary ml-1 -mb-4"
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 0.8, repeat: Infinity, repeatType: 'loop' }}
+                />
+              </motion.div>
+              <motion.div 
+                className="text-4xl md:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70 mt-2"
                 custom={1}
                 variants={textReveal}
               >
                 Worldwide
-              </motion.span>
-            </motion.h1>
+              </motion.div>
+              
+              {/* Decorative elements */}
+              <motion.div 
+                className="absolute -left-10 -top-10 w-20 h-20 rounded-full bg-primary/10 blur-xl"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.6, 0.3]
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+              />
+              <motion.div 
+                className="absolute -right-10 bottom-0 w-32 h-32 rounded-full bg-primary/5 blur-xl"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.2, 0.4, 0.2]
+                }}
+                transition={{
+                  duration: 7,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 1
+                }}
+              />
+            </motion.div>
             
             <motion.p 
               className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
@@ -363,16 +751,49 @@ const Landing = () => {
                 whileHover={buttonHover}
                 whileTap={{ scale: 0.95 }}
               >
-                <Link 
-                  href="/auth/signup" 
-                  className="group relative px-8 py-4 bg-gradient-to-r from-primary to-primary/90 text-white rounded-xl font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 block"
+                <motion.div
+                  className="relative"
+                  whileHover="hover"
+                  initial="initial"
+                  animate="animate"
                 >
-                  <span className="relative z-10 flex items-center justify-center">
-                    Start Your Journey
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </Link>
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary/60 rounded-xl opacity-0 group-hover:opacity-100 blur-md"
+                    variants={{
+                      initial: { opacity: 0, scale: 0.8 },
+                      hover: { 
+                        opacity: 1, 
+                        scale: 1.1,
+                        transition: { duration: 0.3 }
+                      },
+                      animate: {
+                        backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                        transition: {
+                          duration: 4,
+                          repeat: Infinity,
+                          repeatType: 'reverse',
+                          ease: 'linear'
+                        }
+                      }
+                    }}
+                  />
+                  <Link 
+                    href="/auth/signup" 
+                    className="group relative px-8 py-4 bg-gradient-to-r from-primary to-primary/90 text-white rounded-xl font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 block"
+                  >
+                    <span className="relative z-10 flex items-center justify-center">
+                      Start Your Journey
+                      <motion.span
+                        initial={{ x: 0 }}
+                        whileHover={{ x: 5 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                        className="inline-block ml-2"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </motion.span>
+                    </span>
+                  </Link>
+                </motion.div>
               </motion.div>
               
               <motion.button 
@@ -579,6 +1000,7 @@ const Landing = () => {
             {features.map((feature, index) => (
               <FeatureCard 
                 key={index}
+                index={index}
                 icon={feature.icon}
                 title={feature.title}
                 description={feature.description}
@@ -624,6 +1046,8 @@ const Landing = () => {
             {steps.map((step, index) => (
               <StepCard 
                 key={index}
+                index={index}
+                totalSteps={steps.length}
                 number={step.number}
                 icon={step.icon}
                 title={step.title}
@@ -670,6 +1094,7 @@ const Landing = () => {
             {testimonials.map((testimonial, index) => (
               <TestimonialCard 
                 key={index}
+                index={index}
                 name={testimonial.name}
                 role={testimonial.role}
                 content={testimonial.content}
@@ -691,32 +1116,178 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 md:py-28 bg-gradient-to-br from-primary/5 to-primary/10 border-t border-border">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-              Ready to level up your <span className="text-primary">tech journey</span>?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Join our community of 100+ developers and get access to exclusive resources, tutorials, and a supportive network.
-            </p>
+      <section className="relative py-20 md:py-32 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10" />
+          <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+          
+          {/* Floating elements */}
+          {[...Array(8)].map((_, i) => {
+            const size = 100 + Math.random() * 200;
+            const duration = 15 + Math.random() * 15;
+            const delay = Math.random() * 5;
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
             
-            <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
+            return (
+              <motion.div
+                key={i}
+                className="absolute rounded-full bg-gradient-to-br from-primary/5 to-primary/20"
+                style={{
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  left: `${x}%`,
+                  top: `${y}%`,
+                }}
+                animate={{
+                  y: [0, -50, 0],
+                  x: [0, 20, 0],
+                  opacity: [0.1, 0.3, 0.1],
+                  scale: [1, 1.2, 1]
+                }}
+                transition={{
+                  duration: duration,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: delay,
+                  repeatType: 'reverse' as const
+                }}
+              />
+            );
+          })}
+        </div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <motion.div 
+            className="max-w-4xl mx-auto relative"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Decorative elements */}
+            <motion.div 
+              className="absolute -left-20 -top-20 w-40 h-40 rounded-full bg-primary/10 blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.2, 0.4, 0.2]
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+            />
+            
+            <motion.div 
+              className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-secondary/10 blur-3xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.1, 0.3, 0.1]
+              }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: 2
+              }}
+            />
+            
+            <motion.div 
+              className="inline-block mb-6"
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              <div className="inline-flex items-center px-4 py-1.5 text-sm font-medium text-primary/80 bg-primary/5 rounded-full border border-primary/10">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Join Our Community
+              </div>
+            </motion.div>
+            
+            <motion.h2 
+              className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.6 }}
+            >
+              Ready to level up your{' '}
+              <motion.span 
+                className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70"
+                animate={{
+                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: 'linear'
+                }}
+                style={{
+                  backgroundSize: '200% 200%',
+                  display: 'inline-block'
+                }}
+              >
+                tech journey
+              </motion.span>?
+            </motion.h2>
+            
+            <motion.p 
+              className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              Join our community of <span className="font-semibold text-primary">1000+ developers</span> and get access to exclusive resources, tutorials, and a supportive network.
+            </motion.p>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative group"
+              >
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-xl opacity-0 group-hover:opacity-100 blur-md -z-10"
+                  animate={{
+                    opacity: [0, 0.8, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: 'loop'
+                  }}
+                />
+                <Link 
+                  href="/auth/signup" 
+                  className="relative z-10 block px-8 py-4 bg-gradient-to-r from-primary to-primary/80 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <span className="flex items-center justify-center">
+                    Get Started for Free
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Link>
+              </motion.div>
+              
               <Link 
                 href="/auth/signup" 
-                className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                className="px-8 py-4 bg-background text-foreground border border-border rounded-xl font-medium hover:bg-accent/50 transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center gap-2"
               >
-                Get Started for Free
+                <span>Learn More</span>
+                <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
               </Link>
-              <Link 
-                href="/about" 
-                className="px-8 py-4 bg-background text-foreground border border-border rounded-lg font-medium hover:bg-accent transition-all duration-300 shadow-sm hover:shadow"
-              >
-                Learn More
-              </Link>
-            </div>
-          </div>
-
+            </motion.div> 
+          </motion.div>
         </div>
       </section>
     </div>

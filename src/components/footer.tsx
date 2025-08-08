@@ -88,7 +88,7 @@ export function Footer() {
         </div>
         <Separator className="my-8" />
         <div className="text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Your Company Name. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} TechPulse. All rights reserved.</p>
         </div>
       </div>
     </footer>

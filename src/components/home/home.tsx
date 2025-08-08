@@ -185,15 +185,15 @@ const HomePage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <motion.div 
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
-        className="grid grid-cols-1 lg:grid-cols-4 gap-8"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-8"
       >
         {/* Main Content */}
-        <div className="lg:col-span-3 space-y-8">
+        <div className="lg:col-span-8 space-y-8">
           {/* Create Post Card */}
           <motion.div 
             variants={fadeIn}
@@ -524,7 +524,7 @@ const HomePage = () => {
         {/* Sidebar */}
         <motion.div 
           variants={fadeIn}
-          className="space-y-8"
+          className="lg:col-span-4 space-y-8"
         >
           {/* Search */}
           <motion.div 
