@@ -98,7 +98,7 @@ const popularPosts = [
   }
 ];
 
-// Mock data - replace with actual data from your API
+// Mock data - replace with actual data from the API
 const mockFeed = [
   {
     id: 1,

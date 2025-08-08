@@ -1,9 +1,12 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { ModeToggle } from './mode-toggle'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from 'lucide-react'
+import Link from 'next/link'
+import { ModeToggle } from './mode-toggle'
+import { UserProfileDropdown } from './user-profile-dropdown'
+
+//TODO: Replace with actual auth state
+const isLoggedIn = true; //This should come from auth provider
 
 const navItems = [
   { name: 'Home', href: '/home' },
@@ -42,10 +45,18 @@ export function Navbar() {
           <ModeToggle />
           <Button 
             asChild
+            variant="ghost"
             className="h-9 px-4 text-sm font-medium transition-all duration-300 hover:shadow-md"
           >
             <Link href="/contact">Contact</Link>
           </Button>
+          {isLoggedIn ? (
+            <UserProfileDropdown />
+          ) : (
+            <Button asChild className="h-9 px-4 text-sm font-medium">
+              <Link href="/login">Sign In</Link>
+            </Button>
+          )}
         </div>
 
         <div className="md:hidden flex items-center">
@@ -58,21 +69,7 @@ export function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0">
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b border-border/40">
-                  <Link href="/" className="flex items-center space-x-3">
-                    <div className="relative w-8 h-8">
-                      <Image
-                        src="/assets/images/EGA_logo.png"
-                        alt="Zemenay Tech Logo"
-                        layout="fill"
-                        objectFit="contain"
-                        className="rounded-full"
-                      />
-                    </div>
-                    <span className="text-xl font-bold">Zemenay</span>
-                  </Link>
-                </div>
+             
                 <div className="flex-1 p-6 space-y-4 overflow-y-auto">
                   {navItems.map((item) => (
                     <Link
@@ -89,7 +86,6 @@ export function Navbar() {
                     <Link href="/contact">Contact Us</Link>
                   </Button>
                 </div>
-              </div>
             </SheetContent>
           </Sheet>
         </div>
