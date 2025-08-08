@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+'use client';
+
 import { Inter } from "next/font/google";
+import { usePathname } from "next/navigation";
 import { ThemeProvider } from "@/utils/theme-provider";
 import { NavbarSwitcher } from "@/components/NavbarSwitcher";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
-import Providers from "./providers"; // Client wrapper
+import Providers from "./providers";
 import "./globals.css";
 
 const inter = Inter({
@@ -12,10 +14,24 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "TechPulse",
-  description: "Stay ahead with the latest in technology and innovation",
-};
+//TODO: Add metadata later
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const hideFooter = ['/', '/auth/login', '/auth/signup'].includes(pathname);
+  
+  return (
+    <>
+      <NavbarSwitcher />
+      <main className="min-h-screen pt-16 md:pt-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {children}
+        </div>
+      </main>
+      {!hideFooter && <Footer />}
+      <Toaster />
+    </>
+  );
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -23,14 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <Providers>
           <ThemeProvider>
-            <NavbarSwitcher />
-            <main className="min-h-screen pt-16 md:pt-20">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                {children}
-              </div>
-            </main>
-            <Footer />
-            <Toaster />
+            <LayoutContent>{children}</LayoutContent>
           </ThemeProvider>
         </Providers>
       </body>
