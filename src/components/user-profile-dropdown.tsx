@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,11 +17,22 @@ import {
 import { User } from 'lucide-react';
 
 export function UserProfileDropdown() {
-  //TODO: Replace with actual user data from your auth provider
+  const router = useRouter();
+  
+  // TODO: Replace with actual user data from your auth provider
   const user = {
     name: 'John Doe',
     email: 'john@example.com',
     avatar: '',
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Redirect to landing page after logout
+      router.push('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
@@ -50,13 +62,9 @@ export function UserProfileDropdown() {
             Profile
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
