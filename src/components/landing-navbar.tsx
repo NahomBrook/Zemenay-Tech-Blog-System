@@ -8,8 +8,12 @@ export function LandingNavbar() {
     <nav className="fixed top-0 w-full z-50 bg-background/90 dark:bg-background/80 backdrop-blur-md border-b border-border/40 shadow-sm transition-all duration-300">
       <div className="container flex items-center justify-between h-16 px-4 sm:px-6">
         <Link href="/" className="flex items-center space-x-3 group">
-          <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-            Zemenay
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6">
+            <rect width="32" height="32" rx="8" className="fill-primary" />
+            <path d="M8 16L14 22L24 10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            TechPulse
           </span>
         </Link>
         

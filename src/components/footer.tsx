@@ -6,8 +6,6 @@ import { InstagramLogoIcon, LinkedInLogoIcon, EnvelopeClosedIcon } from "@radix-
 const quickLinks = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
-  { name: "Services", href: "/services" },
-  { name: "Pricing", href: "/pricing" },
   { name: "Contact Us", href: "/contact" },
 ]
 
@@ -23,8 +21,11 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-full" />
-              <span className="font-bold text-xl">Zemenay</span>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" className="fill-primary" />
+                <path d="M8 16L14 22L24 10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="font-bold text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">TechPulse</span>
             </Link>
             <div className="flex space-x-4">
               <Button variant="ghost" size="icon" asChild>

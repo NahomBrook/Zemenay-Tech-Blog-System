@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from "@/utils/theme-provider";
 import { NavbarSwitcher } from "@/components/NavbarSwitcher";
 import { Footer } from "@/components/footer";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 const inter = Inter({
@@ -11,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Zemenay",
-  description: "A one stop shop for your tech needs",
+  title: "TechPulse",
+  description: "Stay ahead with the latest in technology and innovation",
 };
 
 export default function RootLayout({
@@ -30,6 +31,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
