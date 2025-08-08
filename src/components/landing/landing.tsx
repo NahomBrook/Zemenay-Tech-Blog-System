@@ -358,6 +358,7 @@ const Landing = () => {
               custom={3}
               variants={textReveal}
             >
+              {/* Different styles for both buttons: "Start Your Journey" and "Explore features"*/}
               <motion.div
                 whileHover={buttonHover}
                 whileTap={{ scale: 0.95 }}
@@ -383,7 +384,7 @@ const Landing = () => {
                 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span>Explore Features</span>
+                <Link href="/auth/signup">Explore Features</Link>
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </motion.div>
