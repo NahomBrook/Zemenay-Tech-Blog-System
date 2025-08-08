@@ -24,8 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <ThemeProvider>
             <NavbarSwitcher />
-            <main className="min-h-screen">
-              {children}
+            <main className="min-h-screen pt-16 md:pt-20">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {children}
+              </div>
             </main>
             <Footer />
             <Toaster />

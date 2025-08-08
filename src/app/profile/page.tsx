@@ -17,6 +17,7 @@ import {
 import { User, Save, Loader2, BarChart2, LifeBuoy, LogOut, Edit3, MessageCircle, Wallet } from "lucide-react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement } from "chart.js";
 import { Pie, Line, Bar } from "react-chartjs-2";
+import type { ChartOptions } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement);
 
@@ -118,9 +119,26 @@ export default function ProfileDashboard() {
     ],
   };
 
-  const smallLineOptions = { maintainAspectRatio: false, plugins: { legend: { display: false } }, elements: { point: { radius: 0 } }, scales: { x: { display: false }, y: { display: false } } };
-  const smallPieOptions = { maintainAspectRatio: false, plugins: { legend: { display: false } } };
-  const chartOptions = { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } };
+  const smallLineOptions: ChartOptions<'line'> = { 
+    maintainAspectRatio: false, 
+    plugins: { legend: { display: false } }, 
+    elements: { point: { radius: 0 } }, 
+    scales: { x: { display: false }, y: { display: false } } 
+  };
+
+  const smallPieOptions: ChartOptions<'pie'> = { 
+    maintainAspectRatio: false, 
+    plugins: { legend: { display: false } } 
+  };
+
+  const chartOptions: ChartOptions<'line' | 'bar'> = { 
+    maintainAspectRatio: false, 
+    plugins: { 
+      legend: { 
+        position: 'bottom' as const
+      } 
+    } 
+  };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
