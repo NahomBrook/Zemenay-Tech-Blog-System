@@ -1,84 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bookmark, Clock, Flame, History, MessageSquare, Search, ThumbsUp, TrendingUp, Tag, ArrowRight, Calendar, ImageIcon, VideoIcon, FileText, Link2, X } from 'lucide-react';
-import NextJsImage from '@/assets/images/Nextjs.gif';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Clock, Calendar, Loader2, Search, TrendingUp, ThumbsUp, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
-// Popular tags for the blog
-// TODO: Data will be fetched from the backend after integration
-const popularTags = [
-  { name: 'React', count: 42, href: "/tag/react" },
-  { name: 'Next.js', count: 38, href: "/tag/nextjs" },
-  { name: 'TypeScript', count: 35, href: "/tag/typescript" },
-  { name: 'Tailwind CSS', count: 28, href: "/tag/tailwind" },
-  { name: 'Node.js', count: 25, href: "/tag/nodejs" },
-  { name: 'Python', count: 22, href: "/tag/python" },
-  { name: 'Docker', count: 19, href: "/tag/docker" },
-  { name: 'Kubernetes', count: 15, href: "/tag/kubernetes" }
-];
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  _count?: {
+    articles: number;
+  };
+}
 
-// Blog categories
-const categories = [
-  { name: 'Web Development' },
-  { name: 'Frontend' },
-  { name: 'Backend' },
-  { name: 'DevOps' },
-  { name: 'Mobile' },
-  { name: 'UI/UX' },
-  { name: 'Database' },
-  { name: 'Cloud' },
-  { name: 'Security' },
-  { name: 'AI/ML' }
-];
+interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  slug: string;
+  coverImage?: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+  author: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string;
+  };
+  categories: Category[];
+  tags: { id: string; name: string }[];
+  _count?: {
+    comments: number;
+    likes: number;
+  };
+  isPinned?: boolean;
+  isFeatured?: boolean;
+  views?: number;
+}
 
-// Featured post
-const featuredPost = {
-  id: 0,
-  title: 'Mastering Next.js 14: A Comprehensive Guide',
-  excerpt: 'Discover the latest features and best practices for building modern web applications with Next.js 14.',
-  author: 'Sarah Johnson',
-  date: '1d ago',
-  readTime: '8 min read',
-  category: 'Web Development',
-  likes: 42,
-  comments: 15,
-  isBookmarked: true,
-  image: NextJsImage
-};
-
-// Mock data - replace with actual data from the API
-const mockFeed = [
-  {
-    id: 1,
-    title: 'Getting Started with Next.js 14',
-    excerpt: 'Learn the new features and improvements in Next.js 14',
-    author: 'Alex Johnson',
-    date: '2h ago',
-    readTime: '5 min read',
-    category: 'Web Development',
-    likes: 24,
-    comments: 8,
-    isBookmarked: true,
-  },
-  {
-    id: 2,
-    title: 'State Management in 2024',
-    excerpt: 'Comparing different state management solutions for React',
-    author: 'Sarah Kim',
-    date: '5h ago',
-    readTime: '8 min read',
-    category: 'Frontend',
-    likes: 42,
-    comments: 15,
-    isBookmarked: false,
-  },
-];
+interface HomeData {
+  featured: Article[];
+  latest: Article[];
+  popular: Article[];
+  categories: Category[];
+}
 
 // Animation variants
 const fadeIn = {
@@ -90,389 +61,213 @@ const fadeIn = {
   }
 };
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
 const HomePage = () => {
-  const [activeTab, setActiveTab] = useState('trending');
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState<{ file: File; type: 'image' | 'video' | 'document' | 'link' } | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const videoInputRef = React.useRef<HTMLInputElement>(null);
-  const docInputRef = React.useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [homeData, setHomeData] = useState<HomeData | null>(null);
+  const [activeTab, setActiveTab] = useState<'latest' | 'liked' | 'commented'>('latest');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'document') => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedMedia({ file, type });
-    }
+  // Fetch home page data
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await fetch('/api/home');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch home data');
+        }
+        
+        const data = await response.json();
+        setHomeData(data);
+      } catch (err) {
+        console.error('Error fetching home data:', err);
+        setError('Failed to load data. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
+
+  // Get data from home data if available
+  const featuredPost = homeData?.featured[0];
+
+  // Format date to relative time
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(date);
   };
 
-  const openFileDialog = (ref: React.RefObject<HTMLInputElement>) => {
-    ref.current?.click();
-  };
-
-  const handleLinkClick = () => {
-    const url = prompt('Enter the URL you want to share:');
-    if (url) {
-      // Handle the link (you can add validation here)
-      console.log('Shared URL:', url);
-      // You can update the UI to show the shared link
-    }
-  };
-
-  const handleTabChange = (tab: string) => {
-    setIsLoading(true);
-    setActiveTab(tab);
-    
-    // Simulate loading
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+  // Calculate read time based on content length
+  const calculateReadTime = (content: string) => {
+    const wordsPerMinute = 200;
+    const words = content.trim().split(/\s+/).length;
+    const minutes = Math.ceil(words / wordsPerMinute);
+    return `${minutes} min read`;
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <motion.div 
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-        className="grid grid-cols-1 lg:grid-cols-12 gap-8"
-      >
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-8 space-y-8">
-          {/* Create Post Card */}
-          <motion.div 
-            variants={fadeIn}
-            className="bg-card rounded-xl border border-border/30 p-4 shadow-sm"
-          >
-            <div className="flex items-start gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src="/images/avatars/user.jpg" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="relative
-                  before:absolute before:pointer-events-none before:inset-0 before:rounded-xl before:ring-1 before:ring-inset before:ring-border/30
-                  focus-within:before:ring-primary/50 focus-within:before:ring-2 transition-shadow duration-200
-                ">
-                  <textarea
-                    placeholder="Share your thoughts, ideas, or updates..."
-                    className="w-full min-h-[80px] p-3 bg-transparent rounded-xl border-0 focus:ring-0 resize-none text-foreground placeholder:text-muted-foreground/60"
-                    rows={3}
-                  />
-                </div>
-                
-                {/* Category Selector */}
-                <div className="mt-3 flex items-center gap-2 flex-wrap">
-                  <select 
-                    className="text-sm bg-muted/30 dark:bg-background border border-border/30 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent
-                    dark:text-foreground dark:border-muted-foreground/30 dark:bg-muted/10 dark:focus:ring-primary/70
-                    [&>option]:bg-background [&>option]:text-foreground"
-                    defaultValue=""
-                  >
-                    <option value="" disabled className="text-muted-foreground">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category.name} value={category.name} className="text-foreground">
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                {/* Media Buttons */}
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleFileChange(e, 'image')}
-                    />
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      className="rounded-full text-muted-foreground hover:text-primary"
-                      onClick={() => openFileDialog(fileInputRef)}
-                    >
-                      <ImageIcon className="h-5 w-5" />
-                      <span className="sr-only">Add photo</span>
-                    </Button>
-
-                    <input
-                      type="file"
-                      ref={videoInputRef}
-                      accept="video/*"
-                      className="hidden"
-                      onChange={(e) => handleFileChange(e, 'video')}
-                    />
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      className="rounded-full text-muted-foreground hover:text-primary"
-                      onClick={() => openFileDialog(videoInputRef)}
-                    >
-                      <VideoIcon className="h-5 w-5" />
-                      <span className="sr-only">Add video</span>
-                    </Button>
-
-                    <input
-                      type="file"
-                      ref={docInputRef}
-                      accept=".pdf,.doc,.docx,.txt"
-                      className="hidden"
-                      onChange={(e) => handleFileChange(e, 'document')}
-                    />
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      className="rounded-full text-muted-foreground hover:text-primary"
-                      onClick={() => openFileDialog(docInputRef)}
-                    >
-                      <FileText className="h-5 w-5" />
-                      <span className="sr-only">Add document</span>
-                    </Button>
-
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
-                      className="rounded-full text-muted-foreground hover:text-primary"
-                      onClick={handleLinkClick}
-                    >
-                      <Link2 className="h-5 w-5" />
-                      <span className="sr-only">Add link</span>
-                    </Button>
-                  </div>
-                  <Button className="rounded-full px-6">
-                    Post
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Preview Area */}
-            {selectedMedia && (
-              <div className="mt-4 border-t border-border/20 pt-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {selectedMedia.type === 'image' && <ImageIcon className="h-5 w-5 text-primary" />}
-                    {selectedMedia.type === 'video' && <VideoIcon className="h-5 w-5 text-primary" />}
-                    {selectedMedia.type === 'document' && <FileText className="h-5 w-5 text-primary" />}
-                    <span className="text-sm font-medium truncate max-w-[200px]">
-                      {selectedMedia.file.name}
-                    </span>
-                  </div>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-                    onClick={() => setSelectedMedia(null)}
-                  >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Remove</span>
-                  </Button>
-                </div>
-                {selectedMedia.type === 'image' && (
-                  <div className="mt-2 rounded-lg overflow-hidden">
-                    <img 
-                      src={URL.createObjectURL(selectedMedia.file)} 
-                      alt="Preview" 
-                      className="max-h-40 w-auto max-w-full object-cover rounded"
-                    />
-                  </div>
-                )}
-                {selectedMedia.type === 'video' && (
-                  <div className="mt-2 rounded-lg overflow-hidden bg-black/5 dark:bg-white/5">
-                    <video 
-                      src={URL.createObjectURL(selectedMedia.file)}
-                      controls
-                      className="max-h-40 w-full object-contain rounded"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </motion.div>
-
           {/* Hero Section with Featured Post */}
-          <motion.article 
-            variants={fadeIn}
-            className="relative rounded-2xl overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
-            <img 
-              src={featuredPost.image.src} 
-              alt={featuredPost.title}
-              className="w-full h-[400px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
-              <Badge className="mb-4 bg-primary/20 hover:bg-primary/30 text-primary-foreground border-primary/30">
-                Featured Post
-              </Badge>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-primary-foreground transition-colors">
-                {featuredPost.title}
-              </h1>
-              <p className="text-muted-foreground text-white/90 mb-6 max-w-2xl">
-                {featuredPost.excerpt}
-              </p>
-              <div className="flex items-center gap-4">
-                <Button variant="secondary" className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  Read Article
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Calendar className="h-4 w-4" />
-                  <span>{featuredPost.date}</span>
-                </div>
+          {isLoading ? (
+            <div className="relative rounded-2xl overflow-hidden bg-muted/30 h-[500px] flex items-center justify-center">
+              <div className="text-center space-y-4 p-8">
+                <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary" />
+                <p className="text-muted-foreground">Loading featured content...</p>
               </div>
             </div>
-          </motion.article>
-
-
-          {/* Trending Now */}
-          <motion.div 
-            variants={fadeIn}
-            className="space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Trending Now</h2>
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                See all
-                <ArrowRight className="ml-1 h-4 w-4" />
+          ) : error ? (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 text-center">
+              <p className="text-destructive">{error}</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
+                Retry
               </Button>
             </div>
-          </motion.div>
+          ) : featuredPost ? (
+            <motion.article 
+              variants={fadeIn}
+              className="relative rounded-2xl overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+              <img 
+                src={featuredPost.coverImage || '/images/placeholder-article.jpg'}
+                alt={featuredPost.title}
+                className="w-full h-[500px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute bottom-0 left-0 right-0 z-20 p-8 text-white">
+                <Badge className="mb-4 bg-primary/90 hover:bg-primary text-white">Featured</Badge>
+                <h1 className="text-4xl font-bold mb-4 leading-tight">
+                  <a href={`/articles/${featuredPost.slug}`} className="hover:underline">
+                    {featuredPost.title}
+                  </a>
+                </h1>
+                <p className="text-lg text-gray-200 mb-6 line-clamp-2">
+                  {featuredPost.excerpt || featuredPost.content.substring(0, 150) + '...'}
+                </p>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8 border-2 border-white/20">
+                      <AvatarImage src={featuredPost.author.image || ''} alt={featuredPost.author.name} />
+                      <AvatarFallback>
+                        {featuredPost.author.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{featuredPost.author.name}</span>
+                  </div>
+                  <span className="text-gray-300">•</span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>{formatDate(featuredPost.createdAt)}</span>
+                  </span>
+                  <span className="text-gray-300">•</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{calculateReadTime(featuredPost.content)}</span>
+                  </span>
+                </div>
+              </div>
+            </motion.article>
+          ) : (
+            <div className="bg-muted/30 rounded-2xl p-8 text-center">
+              <h3 className="text-xl font-medium mb-2">No featured post available</h3>
+              <p className="text-muted-foreground">Check back later for featured content</p>
+            </div>
+          )}
 
-          {/* Feed Tabs */}
-          <motion.div 
-            variants={fadeIn}
-            className="flex items-center border-b border-border/30 pb-2"
-          >
-            {[
-              { id: 'trending', label: 'Trending', icon: <Flame className="h-4 w-4 text-orange-500" /> },
-              { id: 'latest', label: 'Latest', icon: <TrendingUp className="h-4 w-4 text-blue-500" /> },
-              { id: 'following', label: 'Following', icon: <History className="h-4 w-4 text-green-500" /> }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`px-4 py-2 text-sm font-medium flex items-center gap-2 rounded-t-lg transition-colors ${
-                  activeTab === tab.id 
-                    ? 'text-primary border-b-2 border-primary' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </motion.div>
+          {/* Tabbed Section */}
+          <div className="mt-12">
+            <div className="flex items-center border-b border-border/30 pb-2">
+              {[
+                { id: 'latest', label: 'Latest Posts', icon: <TrendingUp className="h-4 w-4 text-blue-500" /> },
+                { id: 'liked', label: 'Most Liked', icon: <ThumbsUp className="h-4 w-4 text-rose-500" /> },
+                { id: 'commented', label: 'Most Commented', icon: <MessageSquare className="h-4 w-4 text-emerald-500" /> }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as 'latest' | 'liked' | 'commented')}
+                  className={`px-4 py-2 text-sm font-medium flex items-center gap-2 rounded-t-lg transition-colors ${
+                    activeTab === tab.id 
+                      ? 'text-primary border-b-2 border-primary' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
-          {/* Feed Content */}
-          <AnimatePresence mode="wait">
-            {isLoading ? (
-              <motion.div 
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-6"
-              >
-                {[1, 2, 3].map((i) => (
-                  <motion.div 
-                    key={i}
-                    className="h-40 bg-muted/30 rounded-xl animate-pulse"
-                    variants={fadeIn}
-                  />
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div 
-                key="content"
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-                className="space-y-6"
-              >
-                {mockFeed.map((post) => (
-                  <motion.div
-                    key={post.id}
-                    variants={fadeIn}
-                    whileHover={{ y: -2 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                  >
-                    <Card className="overflow-hidden border-border/20 hover:shadow-lg transition-all duration-300 group hover:border-primary/30">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Avatar className="h-9 w-9 border-2 border-background group-hover:border-primary/30 transition-colors">
-                            <AvatarImage src={`/images/avatars/${post.author.toLowerCase().replace(/\s+/g, '-')}.jpg`} />
-                            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10">
-                              {post.author.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium group-hover:text-primary transition-colors">
-                              {post.author}
-                            </p>
-                            <p className="text-xs text-muted-foreground flex items-center">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {post.date} · {post.readTime}
-                            </p>
-                          </div>
-                        </div>
-                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                          {post.title}
-                        </CardTitle>
-                        <CardDescription className="text-foreground/80">
-                          {post.excerpt}
-                        </CardDescription>
-                        <Badge 
-                          variant="secondary" 
-                          className="w-fit mt-2 group-hover:bg-primary/10 group-hover:border-primary/30 group-hover:text-primary transition-colors"
-                        >
-                          {post.category}
-                        </Badge>
-                      </CardHeader>
-                      <CardFooter className="flex justify-between items-center pt-0">
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1 group-hover:text-foreground transition-colors">
-                            <ThumbsUp className="h-4 w-4" />
-                            {post.likes}
-                          </span>
-                          <span className="flex items-center gap-1 group-hover:text-foreground transition-colors">
-                            <MessageSquare className="h-4 w-4" />
-                            {post.comments}
-                          </span>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className={`group-hover:text-foreground transition-colors ${post.isBookmarked ? 'text-yellow-500' : 'text-muted-foreground'}`}
-                        >
-                          <Bookmark 
-                            className={`h-5 w-5 ${post.isBookmarked ? 'fill-current' : ''}`} 
-                          />
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {(activeTab === 'latest' ? homeData?.latest : 
+                activeTab === 'liked' ? homeData?.popular : 
+                homeData?.latest)?.map((article) => (
+                <motion.article 
+                  key={article.id}
+                  whileHover={{ y: -4 }}
+                  className="group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="relative h-48">
+                    <img
+                      src={article.coverImage || '/images/placeholder-article.jpg'}
+                      alt={article.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {article.categories?.slice(0, 2).map((category) => (
+                          <Badge key={category.id} variant="secondary" className="text-xs">
+                            {category.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                      <a href={`/articles/${article.slug}`} className="hover:underline">
+                        {article.title}
+                      </a>
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {article.excerpt || article.content.substring(0, 100)}...
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{formatDate(article.createdAt)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                          {article._count?.likes || 0}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                          {article._count?.comments || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Sidebar */}
@@ -500,32 +295,9 @@ const HomePage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border-border/30 overflow-hidden">
-              <CardHeader className="pb-3 border-b border-border/20">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Tag className="h-5 w-5 text-primary" />
-                  <span>Popular Tags</span>
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">Browse articles by popular topics</p>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="flex flex-wrap gap-2">
-                  {popularTags.map((tag, index) => (
-                    <span 
-                      key={index}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors group"
-                    >
-                      <span className="text-foreground group-hover:text-primary transition-colors">
-                        {tag.name}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 };

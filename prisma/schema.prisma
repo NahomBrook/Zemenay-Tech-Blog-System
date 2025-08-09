@@ -20,6 +20,8 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   posts         Post[]
+  bookmarks     Bookmark[]
+  media         Media[]
 }
 
 model Post {
@@ -36,6 +38,8 @@ model Post {
   tags        Tag[]     @relation("PostToTag")
   category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  String?
+  bookmarks   Bookmark[]
+  media       Media[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -61,4 +65,37 @@ model Tag {
   posts     Post[]   @relation("PostToTag")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+}
+
+model Media {
+  id        String   @id @default(uuid())
+  url       String
+  type      String   // 'IMAGE' | 'VIDEO' | 'DOCUMENT'
+  name      String
+  size      Int      // in bytes
+  width     Int?     // for images/videos
+  height    Int?     // for images/videos
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([postId])
 }

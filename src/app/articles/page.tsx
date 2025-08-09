@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,6 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { Image as ImageIcon, Video as VideoIcon, FileText, Link2, X, MessageSquare, ThumbsUp, Bookmark } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 
 interface Article {
   id: string;
@@ -26,163 +27,95 @@ interface Article {
 // Category colors mapping
 const categoryColors: Record<string, string> = {
   'Web Development': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  'Frontend': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+  'Backend': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  'DevOps': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
   'Mobile': 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
   'UI/UX': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
-  'DevOps': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  'Data Science': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
 };
 
-// Sample articles data
-const sampleArticles: Article[] = [
-  {
-    id: '1',
-    title: 'Getting Started with Next.js 14',
-    content: 'Learn how to build modern web applications with the latest features of Next.js 14, including server components, app directory, and more.',
-    author: 'Sarah Johnson',
-    authorAvatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-    date: '2025-06-15T10:30:00Z',
-    category: 'Web Development',
-    likes: 42,
-    comments: 8,
-    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    tags: ['Next.js', 'React', 'JavaScript']
-  },
-  {
-    id: '2',
-    title: 'Building Cross-Platform Mobile Apps',
-    content: 'Learn how to build native mobile apps for iOS and Android using React Native and Flutter with best practices.',
-    author: 'Michael Chen',
-    authorAvatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-    date: '2025-06-10T14:20:00Z',
-    category: 'Mobile',
-    likes: 36,
-    comments: 12,
-    image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    tags: ['React Native', 'Flutter', 'Mobile Development']
-  },
-  {
-    id: '3',
-    title: 'UI/UX Design Principles',
-    content: 'Master the essential UI/UX design principles to create intuitive and engaging user experiences.',
-    author: 'Emma Wilson',
-    authorAvatar: 'https://randomuser.me/api/portraits/women/3.jpg',
-    date: '2025-06-05T09:15:00Z',
-    category: 'UI/UX',
-    likes: 28,
-    comments: 5,
-    image: 'https://images.unsplash.com/photo-1541462608143-67571c6738dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    tags: ['Design', 'User Experience', 'UI Patterns']
-  },
-  {
-    id: '4',
-    title: 'Building Scalable Microservices',
-    content: 'Best practices for designing, deploying, and maintaining microservices at scale with Kubernetes and Docker.',
-    author: 'David Kim',
-    authorAvatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-    date: '2025-06-28T16:20:00Z',
-    category: 'DevOps',
-    likes: 31,
-    comments: 7,
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    tags: ['Microservices', 'DevOps', 'Cloud']
-  },
-  {
-    id: '5',
-    title: 'The Complete Guide to React Native 2023',
-    content: 'Build cross-platform mobile apps with React Native and learn about the latest features and performance optimizations.',
-    author: 'Alex Turner',
-    authorAvatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-    date: '2025-04-20T11:10:00Z',
-    category: 'Mobile',
-    likes: 29,
-    comments: 6,
-    image: 'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    tags: ['React Native', 'Mobile', 'JavaScript']
-  },
-  {
-    id: '6',
-    title: 'UI/UX Design Principles for Developers',
-    content: 'Essential UI/UX principles every developer should know to create better user experiences in their applications.',
-    author: 'Sophia Lee',
-    authorAvatar: 'https://randomuser.me/api/portraits/women/3.jpg',
-    date: '2025-05-15T13:25:00Z',
-    category: 'UI/UX',
-    likes: 34,
-    comments: 9,
-    image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1528&q=80',
-    tags: ['UI/UX', 'Design', 'Frontend']
-  },
-  {
-    id: '7',
-    title: 'Data Science with Python: A Practical Guide',
-    content: 'Learn how to use Python for data analysis, visualization, and machine learning with real-world examples.',
-    author: 'James Wilson',
-    authorAvatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-    date: '2025-05-10T09:45:00Z',
-    category: 'Data Science',
-    likes: 27,
-    comments: 4,
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    tags: ['Python', 'Data Science', 'Machine Learning']
-  },
-  {
-    id: '8',
-    title: 'Cloud Architecture Patterns',
-    content: 'Explore common cloud architecture patterns and best practices for building scalable and resilient applications.',
-    author: 'Olivia Chen',
-    authorAvatar: 'https://randomuser.me/api/portraits/women/4.jpg',
-    date: '2025-06-05T15:30:00Z',
-    category: 'DevOps',
-    likes: 33,
-    comments: 7,
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1472&q=80',
-    tags: ['Cloud', 'AWS', 'Azure', 'GCP']
-  },
-  {
-    id: '9',
-    title: 'Web Security Best Practices',
-    content: 'Essential security practices every web developer should implement to protect their applications from common vulnerabilities.',
-    author: 'Daniel Park',
-    authorAvatar: 'https://randomuser.me/api/portraits/men/5.jpg',
-    date: '2025-07-28T10:20:00Z',
-    category: 'DevOps',
-    likes: 25,
-    comments: 3,
-    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    tags: ['Security', 'Web Dev', 'Best Practices']
-  },
-  {
-    id: '10',
-    title: 'Introduction to Blockchain Development',
-    content: 'A beginner\'s guide to blockchain technology and how to get started with smart contract development.',
-    author: 'Rachel Kim',
-    authorAvatar: 'https://randomuser.me/api/portraits/women/5.jpg',
-    date: '2025-08-22T14:15:00Z',
-    category: 'DevOps',
-    likes: 30,
-    comments: 5,
-    image: 'https://images.unsplash.com/photo-1620121692029-d088224ddc74?ixlib=rb-4.3.1&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80',
-    tags: ['Blockchain', 'Ethereum', 'Smart Contracts']
-  },
-];
-
-// Get all unique categories from the sample articles
-const allCategories = Array.from(new Set(sampleArticles.map(article => article.category)));
+// Available categories as objects with name (excluding 'All' as it's added separately)
+const availableCategories = [
+  { name: 'Web Development' },
+  { name: 'Frontend' },
+  { name: 'Backend' },
+  { name: 'DevOps' },
+  { name: 'Mobile' },
+  { name: 'UI/UX' },
+].filter(cat => cat.name !== 'All');
 
 const ArticlesList = () => {
-  const [posts, setPosts] = useState<Article[]>(sampleArticles);
+  const [posts, setPosts] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [newPost, setNewPost] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedMedia, setSelectedMedia] = useState<{ file: File; type: 'image' | 'video' | 'document' | 'link' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Get all unique categories from both available and post categories
+  const allCategories = React.useMemo(() => {
+    // Get unique categories from posts
+    const postCategories = [...new Set(posts.map(article => article.category))]
+      .filter(cat => cat !== 'All')
+      .map(cat => ({ name: cat }));
+    
+    // Combine with available categories and remove duplicates
+    const combined = [...availableCategories];
+    postCategories.forEach(cat => {
+      if (!combined.some(availCat => availCat.name === cat.name)) {
+        combined.push(cat);
+      }
+    });
+    
+    return [{ name: 'All' }, ...combined];
+  }, [posts]);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch articles from the API
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/articles');
+        if (!response.ok) {
+          throw new Error('Failed to fetch articles');
+        }
+        const data = await response.json();
+        
+        // Map API response to match the Article interface
+        const formattedPosts = data.data.map((article: any) => ({
+          id: article.id,
+          title: article.title,
+          content: article.excerpt || article.content.substring(0, 200) + '...',
+          author: article.author?.name || 'Anonymous',
+          authorAvatar: article.author?.image || '',
+          date: new Date(article.createdAt).toLocaleDateString(),
+          category: article.categories?.[0]?.name || 'Uncategorized',
+          likes: article._count?.likes || 0,
+          comments: article._count?.comments || 0,
+          image: article.coverImage || '/placeholder-article.jpg',
+          tags: article.tags?.map((tag: any) => tag.name) || []
+        }));
+        
+        setPosts(formattedPosts);
+      } catch (err) {
+        console.error('Error fetching articles:', err);
+        setError('Failed to load articles. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
 
   // Filter posts based on selected category
   const filteredPosts = selectedCategory === 'All' 
     ? posts 
-    : posts.filter(post => post.category === selectedCategory);
+    : posts?.filter(post => post.category === selectedCategory);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'document') => {
     const file = e.target.files?.[0];
@@ -219,14 +152,14 @@ const ArticlesList = () => {
         author: 'You',
         authorAvatar: 'https://randomuser.me/api/portraits/men/1.jpg',
         date: new Date().toISOString(),
-        category: 'General',
+        category: 'Web Development',
         likes: 0,
         comments: 0,
         image: selectedMedia?.type === 'image' ? URL.createObjectURL(selectedMedia.file) : 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1472&q=80',
         tags: ['New']
       };
 
-      setPosts([newArticle, ...posts]);
+      //setPosts([newArticle, ...posts]);
       setNewPost('');
       setSelectedMedia(null);
       setIsSubmitting(false);
@@ -262,28 +195,29 @@ const ArticlesList = () => {
     { name: 'Data Science' }
   ];
 
-  return (
-    <motion.div 
-      initial="hidden"
-      animate="visible"
-      variants={staggerContainer}
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-    >
-      {/* Header */}
-      <motion.div 
-        variants={fadeIn}
-        className="mb-10 text-center"
-      >
-        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-4">
-          Latest Articles
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-          Discover the latest insights, tutorials, and news in the world of technology and development.
-        </p>
-      </motion.div>
+  const { data: session } = useSession();
 
-      {/* Main Content */}
-      <div className="space-y-8">
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+              Latest Articles
+            </h1>
+            <p className="mt-1 text-xl text-gray-500 dark:text-gray-400">
+              Discover the latest insights and tutorials from our community
+            </p>
+          </div>
+          {session && (
+            <Link 
+              href="/articles/new"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              New Post
+            </Link>
+          )}
+        </div>
         {/* Create Post Card */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -461,30 +395,21 @@ const ArticlesList = () => {
           transition={{ duration: 0.3, delay: 0.1 }}
           className="flex flex-wrap gap-3 mb-8 p-4 bg-card rounded-lg shadow-sm border border-border/30 overflow-x-auto"
         >
-          <button
-            key="all"
-            onClick={() => setSelectedCategory('All')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap border ${
-              selectedCategory === 'All'
-                ? 'bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20 dark:shadow-primary/10'
-                : 'text-foreground/80 dark:text-foreground/80 hover:bg-muted/50 border-border/50 hover:border-border/80 dark:border-border/30 dark:hover:border-border/60'
-            }`}
-          >
-            All
-          </button>
-          {allCategories.map((category) => {
-            const [lightBg, lightText, darkBg, darkText] = categoryColors[category].split(' ');
+          {allCategories.map(({ name }) => {
+            // Use a fallback color if the category is not found in the mapping
+            const colorString = categoryColors[name] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+            const [lightBg, lightText, darkBg, darkText] = colorString.split(' ');
             return (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={name}
+                onClick={() => setSelectedCategory(name)}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap border ${
-                  selectedCategory === category
+                  selectedCategory === name
                     ? `${lightBg} ${lightText} ${darkBg} ${darkText} shadow-md ${lightBg.replace('bg-', 'shadow-')}/20 dark:${darkBg.replace('dark:bg-', 'shadow-')}/10`
                     : 'text-foreground/80 dark:text-foreground/80 hover:bg-muted/50 border-border/50 hover:border-border/80 dark:border-border/30 dark:hover:border-border/60'
                 }`}
               >
-                {category}
+                {name}
               </button>
             );
           })}
@@ -496,7 +421,7 @@ const ArticlesList = () => {
           className="space-y-8"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPosts.map((article) => {
+          {filteredPosts?.map((article) => {
             const categoryColor = categoryColors[article.category] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
             
             return (
@@ -582,7 +507,7 @@ const ArticlesList = () => {
         </div>
       </motion.div>
     </div>
-    </motion.div>
+    </div>
   );
 };
 

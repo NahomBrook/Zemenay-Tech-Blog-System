@@ -161,6 +161,28 @@ exports.Prisma.TagScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BookmarkScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  postId: 'postId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MediaScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  type: 'type',
+  name: 'name',
+  size: 'size',
+  width: 'width',
+  height: 'height',
+  userId: 'userId',
+  postId: 'postId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -181,7 +203,9 @@ exports.Prisma.ModelName = {
   User: 'User',
   Post: 'Post',
   Category: 'Category',
-  Tag: 'Tag'
+  Tag: 'Tag',
+  Bookmark: 'Bookmark',
+  Media: 'Media'
 };
 
 /**
