@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
-import { Image as ImageIcon, Video as VideoIcon, FileText, Link2, X, MessageSquare, ThumbsUp, Bookmark, Clock } from 'lucide-react';
+import { Image as ImageIcon, Video as VideoIcon, FileText, Link2, X, MessageSquare, ThumbsUp, Bookmark } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Article {
@@ -473,7 +473,7 @@ const ArticlesList = () => {
             All
           </button>
           {allCategories.map((category) => {
-            const [lightBg, lightText, lightHover, darkBg, darkText] = categoryColors[category].split(' ');
+            const [lightBg, lightText, darkBg, darkText] = categoryColors[category].split(' ');
             return (
               <button
                 key={category}

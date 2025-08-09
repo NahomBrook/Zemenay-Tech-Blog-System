@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { ThumbsUp, MessageSquare, Bookmark, Clock, ArrowLeft, Share2, MoreHorizontal } from 'lucide-react';
+import { ThumbsUp, MessageSquare, Bookmark, ArrowLeft, Share2, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 

@@ -18,8 +18,6 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // Add your own authentication logic here
-        // This is a basic example - replace with your actual user lookup
         if (!credentials) return null;
         
         // TODO: Replace with your actual user authentication logic

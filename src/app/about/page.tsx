@@ -1,13 +1,12 @@
 'use client';
 
 import React from 'react';
-import { BookOpen, Code, Globe, Heart, MessageSquare, Rocket, Users } from 'lucide-react';
+import { BookOpen, Code, Heart, MessageSquare, Rocket, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 
 // Create a motion button component
 const MotionButton = motion(Button);
@@ -33,17 +32,6 @@ const item = {
       type: 'spring',
       stiffness: 100,
       damping: 15
-    }
-  }
-};
-
-const fadeIn = {
-  hidden: { opacity: 0 },
-  show: { 
-    opacity: 1,
-    transition: {
-      duration: 0.8,
-      ease: 'easeOut'
     }
   }
 };

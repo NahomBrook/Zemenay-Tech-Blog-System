@@ -5,6 +5,17 @@ import Link from 'next/link';
 import { motion, useScroll, AnimatePresence } from 'framer-motion';
 import { ArrowRight, BookOpen, Code, Users, MessageSquare, Zap, Layout, UserPlus, Share2, Star, Sparkles, CheckCircle, ArrowDown } from 'lucide-react';
 
+// Helper hook to detect if we're on the client
+function useIsClient() {
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  return isClient;
+}
+
 // Animation variants
 const container = {
   hidden: { opacity: 0 },
@@ -106,33 +117,30 @@ const StepCard = ({ number, icon, title, description, index, totalSteps }: StepC
       
       <motion.div 
         variants={item}
-        className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg group h-full"
+        className="relative bg-card/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50 shadow-lg group h-full"
         whileHover={{ y: -5 }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
-        transition={{ delay: 0.1 * index, duration: 0.6 }}
+        transition={{ 
+          delay: 0.1 * index, 
+          duration: 0.6,
+          scale: { duration: 0.2 },
+          rotate: { duration: 0.6 },
+          boxShadow: { duration: 0.3 }
+        }}
+        animate={{
+          rotate: isHovered ? [0, 10, -10, 0] : 0,
+          boxShadow: isHovered 
+            ? '0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 8px 10px -6px rgba(59, 130, 246, 0.4)' 
+            : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+        }}
       >
-        {/* Animated number badge */}
-        <motion.div 
-          className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg z-10"
-          animate={{
-            scale: isHovered ? 1.1 : 1,
-            rotate: isHovered ? [0, 10, -10, 0] : 0,
-            boxShadow: isHovered 
-              ? '0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 8px 10px -6px rgba(59, 130, 246, 0.4)' 
-              : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-          }}
-          transition={{
-            scale: { duration: 0.2 },
-            rotate: { duration: 0.6 },
-            boxShadow: { duration: 0.3 }
-          }}
-        >
+        <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg z-10">
           {number}
-        </motion.div>
+        </div>
         
         <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
           {React.cloneElement(icon, {
@@ -142,19 +150,21 @@ const StepCard = ({ number, icon, title, description, index, totalSteps }: StepC
         
         <h3 className="text-xl font-semibold text-foreground dark:text-foreground mb-3 flex items-center">
           {title}
-          <motion.span 
-            className="ml-2 text-primary opacity-0 group-hover:opacity-100"
-            animate={{ 
-              x: isHovered ? [0, 5, 0] : 0,
-              opacity: isHovered ? 1 : 0
-            }}
-            transition={{ 
-              x: { duration: 1, repeat: Infinity },
-              opacity: { duration: 0.3 }
-            }}
-          >
-            →
-          </motion.span>
+          {!isLast && (
+            <motion.span 
+              className="ml-2 text-primary opacity-0 group-hover:opacity-100"
+              animate={{ 
+                x: isHovered ? [0, 5, 0] : 0,
+                opacity: isHovered ? 1 : 0
+              }}
+              transition={{ 
+                x: { duration: 1, repeat: Infinity },
+                opacity: { duration: 0.3 }
+              }}
+            >
+              →
+            </motion.span>
+          )}
         </h3>
         
         <p className="text-muted-foreground dark:text-muted-foreground leading-relaxed">
@@ -184,12 +194,29 @@ interface TestimonialCardProps {
 
 const TestimonialCard = React.memo(function TestimonialCard({ name, role, content, index }: TestimonialCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const isClient = useIsClient();
   
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
+  // Don't render anything during SSR to prevent hydration mismatch
+  if (!isClient) {
+    return (
+      <div className="relative bg-card/50 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg overflow-hidden min-h-[200px]">
+        <div className="animate-pulse space-y-4">
+          <div className="flex items-center">
+            <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div className="ml-4 space-y-2">
+              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/6"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   // Gradient animation for the avatar
   const avatarGradient = {
@@ -208,12 +235,12 @@ const TestimonialCard = React.memo(function TestimonialCard({ name, role, conten
   return (
     <motion.div 
       className="relative bg-card/50 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-lg overflow-hidden"
-      initial={isMounted ? { opacity: 0, y: 20 } : false}
-      animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ delay: isMounted ? index * 0.1 : 0, duration: 0.6 }}
-      onHoverStart={() => isMounted && setIsHovered(true)}
-      onHoverEnd={() => isMounted && setIsHovered(false)}
+      transition={{ delay: index * 0.1, duration: 0.6 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
     >
       {/* Animated background highlight */}
       <motion.div 
@@ -286,14 +313,14 @@ const TestimonialCard = React.memo(function TestimonialCard({ name, role, conten
           {[1, 2, 3, 4, 5].map((_, i) => (
             <motion.div
               key={i}
-              animate={isMounted ? {
+              animate={{
                 scale: isHovered ? [1, 1.3, 1] : 1,
                 y: isHovered ? [-2, 2, -2] : 0
-              } : {}}
+              }}
               transition={{
                 duration: 0.5,
-                delay: isMounted ? i * 0.1 : 0,
-                repeat: isMounted && isHovered ? Infinity : 0
+                delay: i * 0.1,
+                repeat: isHovered ? Infinity : 0
               }}
             >
               <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
@@ -305,36 +332,72 @@ const TestimonialCard = React.memo(function TestimonialCard({ name, role, conten
       {/* Decorative elements */}
       <motion.div 
         className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-primary/5"
-          animate={isMounted ? {
-            scale: isHovered ? 1.5 : 1,
-            opacity: isHovered ? 0.8 : 0.3
-          } : {}}
-          transition={{ duration: 0.5 }}
+        animate={{
+          scale: isHovered ? 1.5 : 1,
+          opacity: isHovered ? 0.8 : 0.3
+        }}
+        transition={{ duration: 0.5 }}
       />
     </motion.div>
   );
 });
 
 const Landing = () => {
+  const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
-  const [isMounted, setIsMounted] = useState(false);
+  const isClient = useIsClient();
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const texts = ['Empowering Developers', 'Building Community', 'Sharing Knowledge'];
   const [displayText, setDisplayText] = useState('');
   const [typingForward, setTypingForward] = useState(true);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [animationValues, setAnimationValues] = useState({
-    duration1: 0,
-    duration2: 0,
-    delay1: 0,
-    delay2: 0
-  });
-  
-  // Set mounted state after component mounts (client-side only)
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  // Client-side only component for animations
+  const AnimatedBackground = () => {
+    const [animationValues] = useState(() => ({
+      duration1: 6 + Math.random() * 4, // 6-10 seconds
+      duration2: 8 + Math.random() * 4  // 8-12 seconds
+    }));
+
+    return (
+      <>
+        {[
+          { id: 1, className: 'top-1/4 left-1/4 w-64 h-64', duration: animationValues.duration1 },
+          { id: 2, className: 'top-1/2 right-1/4 w-40 h-40', duration: animationValues.duration2 },
+          { id: 3, className: 'bottom-1/4 left-1/3 w-32 h-32', duration: animationValues.duration1 + 2 },
+          { id: 4, className: 'top-1/3 right-1/3 w-48 h-48', duration: animationValues.duration2 - 1 },
+          { id: 5, className: 'bottom-1/3 left-1/4 w-36 h-36', duration: animationValues.duration1 + 1 },
+          { 
+            id: 6, 
+            className: 'bottom-1/4 right-1/4 w-80 h-80', 
+            bg: 'bg-secondary/10',
+            duration: animationValues.duration2
+          }
+        ].map((el, index) => (
+          <motion.div 
+            key={el.id}
+            className={`absolute ${el.className} ${el.bg || 'bg-primary/10'} rounded-full blur-3xl`}
+            initial={{ y: 0 }}
+            animate={{
+              y: [0, -15, 0],
+              transition: {
+                duration: el.duration,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: index * 0.3,
+                repeatType: 'reverse' as const
+              },
+            }}
+          />
+        ))}
+      </>
+    );
+  };
   
   // Text reveal animation
   const textReveal = {
@@ -360,32 +423,13 @@ const Landing = () => {
     }
   };
   
-  // Set up client-side only values and effects
+  // Text typing effect
   useEffect(() => {
-    const handleMount = () => {
-      setIsMounted(true);
-      // Set random animation values only on client side
-      setAnimationValues({
-        duration1: 5 + Math.random() * 5,
-        duration2: 5 + Math.random() * 5,
-        delay1: 0.5,
-        delay2: 1
-      });
-    };
-    
-    if (typeof window !== 'undefined') {
-      handleMount();
-    }
-    
-    return () => setIsMounted(false);
-  }, []);
-
-  useEffect(() => {
-    if (!isMounted) return;
+    if (!isClient) return;
     
     const typeText = () => {
       const currentText = texts[currentTextIndex];
-
+      
       if (typingForward) {
         if (currentCharIndex < currentText.length) {
           setDisplayText(currentText.substring(0, currentCharIndex + 1));
@@ -406,7 +450,7 @@ const Landing = () => {
 
     const timer = setTimeout(typeText, typingForward ? 100 : 50);
     return () => clearTimeout(timer);
-  }, [currentCharIndex, currentTextIndex, typingForward, isMounted, texts]);
+  }, [currentTextIndex, currentCharIndex, typingForward, texts, isClient]);
 
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
@@ -451,39 +495,8 @@ const Landing = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-[size:20px_20px] opacity-5" />
         
-        {/* Animated floating elements */}
-        {isMounted && (
-          <>
-            <motion.div 
-              className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary/10 blur-3xl"
-              initial={{ y: 0 }}
-              animate={{
-                y: [0, -15, 0],
-                transition: {
-                  duration: animationValues.duration1,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: animationValues.delay1,
-                  repeatType: 'reverse' as const
-                }
-              }}
-            />
-            <motion.div 
-              className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/10 blur-3xl"
-              initial={{ y: 0 }}
-              animate={{
-                y: [0, -15, 0],
-                transition: {
-                  duration: animationValues.duration2,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: animationValues.delay2,
-                  repeatType: 'reverse' as const
-                }
-              }}
-            />
-          </>
-        )}
+        {/* Client-side only animated elements */}
+        {isClient && <AnimatedBackground />}
       </div>
 
       {/* Navigation */}
@@ -541,7 +554,7 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section 
-        className="relative pt-24 pb-40 md:pt-32 md:pb-56 overflow-hidden min-h-screen flex items-center mt-16 transition-opacity duration-500"
+        className="relative pt-4 pb-40 md:pt-10 md:pb-56 overflow-hidden min-h-screen flex items-start transition-opacity duration-500"
         style={{ opacity: isMounted ? 1 : 0, transform: isMounted ? 'translateY(0)' : 'translateY(20px)' }}
       >
         <div className="container mx-auto px-4">

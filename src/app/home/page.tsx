@@ -2,14 +2,13 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bookmark, Clock, Flame, History, LayoutGrid, MessageSquare, Search, Settings, ThumbsUp, TrendingUp, BookOpen, Tag, Mail, ArrowRight, Calendar, User, Code, Image as ImageIcon, Video as VideoIcon, FileText, Link2, X } from 'lucide-react';
+import { Bookmark, Clock, Flame, History, MessageSquare, Search, ThumbsUp, TrendingUp, Tag, ArrowRight, Calendar, ImageIcon, VideoIcon, FileText, Link2, X } from 'lucide-react';
 import NextJsImage from '@/assets/images/Nextjs.gif';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import Link from 'next/link'; 
 
 // Popular tags for the blog
 // TODO: Data will be fetched from the backend after integration
@@ -52,69 +51,6 @@ const featuredPost = {
   isBookmarked: true,
   image: NextJsImage
 };
-
-// Featured Authors
-//TODO: Data will be fetched from the backend after integration
-const featuredAuthors = [
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    role: 'Senior Web Developer',
-    avatar: '/images/avatars/author1.jpg',
-    posts: 42,
-    followers: '12.5k'
-  },
-  {
-    id: 2,
-    name: 'Michael Chen',
-    role: 'UI/UX Designer',
-    avatar: '/images/avatars/author2.jpg',
-    posts: 28,
-    followers: '8.7k'
-  },
-  {
-    id: 3,
-    name: 'Emily Rodriguez',
-    role: 'DevOps Engineer',
-    avatar: '/images/avatars/author3.jpg',
-    posts: 35,
-    followers: '15.2k'
-  }
-];
-
-// Popular Posts
-const popularPosts = [
-  {
-    id: 5,
-    title: 'Building Scalable Microservices with Docker',
-    excerpt: 'Learn how to design and deploy microservices at scale',
-    image: '/images/posts/microservices.jpg',
-    date: '3d ago',
-    readTime: '10 min read',
-    likes: 89,
-    comments: 24
-  },
-  {
-    id: 6,
-    title: 'The Future of React Server Components',
-    excerpt: 'Exploring the next generation of React architecture',
-    image: '/images/posts/react-future.jpg',
-    date: '5d ago',
-    readTime: '7 min read',
-    likes: 124,
-    comments: 42
-  },
-  {
-    id: 7,
-    title: 'Getting Started with WebAssembly',
-    excerpt: 'A practical guide to WebAssembly for web developers',
-    image: '/images/posts/webassembly.jpg',
-    date: '1w ago',
-    readTime: '12 min read',
-    likes: 67,
-    comments: 18
-  }
-];
 
 // Mock data - replace with actual data from the API
 const mockFeed = [
