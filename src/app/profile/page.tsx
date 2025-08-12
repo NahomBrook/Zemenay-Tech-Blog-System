@@ -188,11 +188,11 @@ export default function ProfileDashboard() {
   };
 
   return (
-    <main className="pt-20 container mx-auto px-4 max-w-7xl">
-      <div className="flex gap-6">
+    <div className="w-screen -ml-6 overflow-x-hidden">
+      <div className="flex w-screen">
         {/* SIDEBAR */}
         <motion.aside
-          className="w-64 fixed top-16 left-0 h-[calc(100vh-4rem)] rounded-md border border-border/10 p-4 bg-white/60 dark:bg-slate-900/50 overflow-y-auto"
+          className="w-56 h-[calc(100vh-4rem)] border-r border-border/10 p-2 bg-white/60 dark:bg-slate-900/50 overflow-y-auto sticky top-16 flex-shrink-0"
           initial="hidden"
           animate="visible"
           variants={sidebarVariants}
@@ -363,7 +363,7 @@ export default function ProfileDashboard() {
         </motion.aside>
 
         {/* MAIN AREA */}
-        <section className="flex-1 ml-72">
+        <section className="flex-1 p-4 overflow-x-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={view}
@@ -586,6 +586,6 @@ export default function ProfileDashboard() {
           </AnimatePresence>
         </section>
       </div>
-    </main>
+    </div>
   );
 }
