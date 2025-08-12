@@ -37,8 +37,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
+      <body className={`${inter.className} max-w-[100vw] overflow-x-hidden`}>
         <Providers>
           <ThemeProvider>
             <LayoutContent>{children}</LayoutContent>
