@@ -17,9 +17,9 @@ const legalLinks = [
 export function Footer() {
   return (
     <footer className="bg-background border-t">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-4">
+      <div className="container mx-auto px-8 py-2">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-2">
             <Link href="/" className="flex items-center space-x-2">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="32" height="32" rx="8" className="fill-primary" />
