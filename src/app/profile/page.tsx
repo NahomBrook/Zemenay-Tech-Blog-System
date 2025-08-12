@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { User, Save, Loader2, BarChart2, LifeBuoy, LogOut, Edit3, MessageCircle, Wallet } from "lucide-react";
+import { User, Save, Loader2, BarChart2, LogOut, Edit3, Wallet } from "lucide-react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement } from "chart.js";
 import { Pie, Line, Bar } from "react-chartjs-2";
 import type { ChartOptions } from 'chart.js';
@@ -44,21 +44,17 @@ const chartVariants = {
   visible: { scale: 1, opacity: 1, transition: { duration: 0.5 } },
 };
 
-const dialogVariants = {
-  hidden: { scale: 0.9, opacity: 0 },
-  visible: { scale: 1, opacity: 1, transition: { duration: 0.3 } },
-};
-
 type Tx = { id: string; date: string; desc: string; amount: number; type: "credit" | "debit" };
 
 export default function ProfileDashboard() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
 
   // Redirect to login if not authenticated
+  /*
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/login');
+      router.push('/auth/login');
     }
   }, [status, router]);
 
@@ -70,7 +66,8 @@ export default function ProfileDashboard() {
       </div>
     );
   }
-
+  */
+ 
   // User data with session integration
   const [user, setUser] = useState({
     name: session?.user?.name ?? "Nahom",
@@ -94,7 +91,7 @@ export default function ProfileDashboard() {
     interactions: { likes: 340, comments: 88, shares: 46 },
   }), []);
 
-  const [view, setView] = useState<"profile" | "analytics" | "faq" | "chatbot">("profile");
+  const [view, setView] = useState<"profile" | "analytics">("profile");
   const [editTemp, setEditTemp] = useState({ name: user.name, username: user.username, bio: user.bio, avatar: user.avatar });
   const [isSaving, setIsSaving] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -185,29 +182,7 @@ export default function ProfileDashboard() {
     }
   };
 
-  // Mock chatbot responses
-  const getChatbotResponse = (input: string) => {
-    const lowerInput = input.toLowerCase();
-    if (lowerInput.includes("software") || lowerInput.includes("zemenay")) {
-      return "Zemenay's digital solutions include website development, API integrations, and custom software for businesses. How can I assist you further?";
-    }
-    return "I'm here to help with Zemenay's digital solutions! Ask about our services or your account.";
-  };
-
-  const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState<{ sender: "user" | "bot"; text: string }[]>([
-    { sender: "bot", text: "Welcome to Zemenay's Chatbot! Ask about our digital solutions or your account." },
-  ]);
-
-  const handleChatSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (chatInput.trim()) {
-      setChatMessages([...chatMessages, { sender: "user", text: chatInput }, { sender: "bot", text: getChatbotResponse(chatInput) }]);
-      setChatInput("");
-    }
-  };
-
-  return (
+ return (
     <div className="w-screen -ml-6 overflow-x-hidden">
       <div className="flex w-screen">
         {/* SIDEBAR */}
@@ -319,52 +294,6 @@ export default function ProfileDashboard() {
               className={`flex items-center gap-2 px-3 py-2 rounded hover:bg-primary/5 ${view === "analytics" ? "bg-primary/5 text-primary" : ""}`}
             >
               <BarChart2 className="h-4 w-4" /> Analytics
-            </button>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-primary/5">
-                  <MessageCircle className="h-4 w-4" /> My Chatbot
-                </button>
-              </DialogTrigger>
-              <motion.div variants={dialogVariants} initial="hidden" animate="visible">
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Zemenay Chatbot</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="text-sm text-muted-foreground">
-                      <p className="font-medium">About Zemenay Digital Solutions</p>
-                      <p>Zemenay provides cutting-edge digital solutions, including website development, API integrations, and custom software tailored for businesses. Your {user.status} subscription grants access to priority support and enhanced features.</p>
-                    </div>
-                    <div className="border rounded p-4 max-h-64 overflow-y-auto">
-                      {chatMessages.map((msg, index) => (
-                        <div key={index} className={`mb-2 ${msg.sender === "user" ? "text-right" : "text-left"}`}>
-                          <span className={`inline-block p-2 rounded ${msg.sender === "user" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-700"}`}>
-                            {msg.text}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <form onSubmit={handleChatSubmit} className="flex gap-2">
-                      <Input
-                        value={chatInput}
-                        onChange={(e) => setChatInput(e.target.value)}
-                        placeholder="Ask about Zemenay's solutions..."
-                        className="flex-1"
-                      />
-                      <Button type="submit">Send</Button>
-                    </form>
-                  </div>
-                </DialogContent>
-              </motion.div>
-            </Dialog>
-
-            <button
-              onClick={() => setView("faq")}
-              className={`flex items-center gap-2 px-3 py-2 rounded hover:bg-primary/5 ${view === "faq" ? "bg-primary/5 text-primary" : ""}`}
-            >
-              <LifeBuoy className="h-4 w-4" /> FAQ
             </button>
 
             <button
@@ -560,56 +489,6 @@ export default function ProfileDashboard() {
                     </motion.div>
                   </div>
                 </div>
-              )}
-
-              {view === "faq" && (
-                <div className="p-4 border rounded">
-                  <h3 className="text-lg font-semibold mb-4">Help / FAQ</h3>
-                  <div className="space-y-3">
-                    <details className="p-3 border rounded">
-                      <summary className="font-medium cursor-pointer">How to edit profile?</summary>
-                      <div className="mt-2 text-sm text-muted-foreground">Use the Edit Profile button in the sidebar or profile section to update name, username, and bio.</div>
-                    </details>
-                    <details className="p-3 border rounded">
-                      <summary className="font-medium cursor-pointer">Digital solution transactions</summary>
-                      <div className="mt-2 text-sm text-muted-foreground">View payments for services like website development and API integrations in the Transactions section.</div>
-                    </details>
-                    <details className="p-3 border rounded">
-                      <summary className="font-medium cursor-pointer">Subscription tiers</summary>
-                      <div className="mt-2 text-sm text-muted-foreground">Pro subscriptions offer higher payout rates and priority support.</div>
-                    </details>
-                  </div>
-                </div>
-              )}
-
-              {view === "chatbot" && (
-                <motion.div className="p-4 border rounded" variants={dialogVariants} initial="hidden" animate="visible">
-                  <h3 className="text-lg font-semibold mb-4">Zemenay Chatbot</h3>
-                  <div className="space-y-4">
-                    <div className="text-sm text-muted-foreground">
-                      <p className="font-medium">About Zemenay Digital Solutions</p>
-                      <p>Zemenay provides cutting-edge digital solutions, including website development, API integrations, and custom software tailored for businesses. Your {user.status} subscription grants access to priority support and enhanced features.</p>
-                    </div>
-                    <div className="border rounded p-4 max-h-64 overflow-y-auto">
-                      {chatMessages.map((msg, index) => (
-                        <div key={index} className={`mb-2 ${msg.sender === "user" ? "text-right" : "text-left"}`}>
-                          <span className={`inline-block p-2 rounded ${msg.sender === "user" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-700"}`}>
-                            {msg.text}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <form onSubmit={handleChatSubmit} className="flex gap-2">
-                      <Input
-                        value={chatInput}
-                        onChange={(e) => setChatInput(e.target.value)}
-                        placeholder="Ask about Zemenay's solutions..."
-                        className="flex-1"
-                      />
-                      <Button type="submit">Send</Button>
-                    </form>
-                  </div>
-                </motion.div>
               )}
             </motion.div>
           </AnimatePresence>
