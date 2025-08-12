@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/utils/theme-provider";
 import { NavbarSwitcher } from "@/components/NavbarSwitcher";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
+import { Chatbot } from "@/components/Chatbot";
 import Providers from "./providers";
 import "./globals.css";
 
@@ -29,6 +30,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       </main>
       {!hideFooter && <Footer />}
       <Toaster />
+      <Chatbot />
     </>
   );
 }
