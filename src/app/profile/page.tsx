@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useSession, signOut, getSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,26 @@ const dialogVariants = {
 type Tx = { id: string; date: string; desc: string; amount: number; type: "credit" | "debit" };
 
 export default function ProfileDashboard() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status, router]);
+
+  // Show loading state
+  if (status === 'loading' || !session) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // User data with session integration
   const [user, setUser] = useState({
     name: session?.user?.name ?? "Nahom",
     username: session?.user?.name ? session.user.name.split(" ").join("").toLowerCase() : "nahom91",
@@ -481,19 +501,28 @@ export default function ProfileDashboard() {
                     </div>
                   </div>
                   <div className="p-4 border rounded">
-                    <h3 className="text-lg font-semibold mb-3">FAQ</h3>
-                    <div className="space-y-2">
-                      <details className="p-2 rounded hover:bg-slate-50">
-                        <summary className="cursor-pointer font-medium">How do I withdraw my earnings?</summary>
-                        <div className="mt-2 text-sm text-muted-foreground">Request withdrawal via Transactions → Withdraw. Processed within 5 business days.</div>
+                    <h3 className="text-lg font-semibold mb-4">Frequently Asked Questions</h3>
+                    <div className="space-y-3">
+                      <details className="p-3 border rounded">
+                        <summary className="font-medium cursor-pointer">How do I edit my profile information?</summary>
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          You can update your profile information by clicking on the 'Edit Profile' button in the sidebar. 
+                          From there, you can change your display name, bio, and profile picture.
+                        </div>
                       </details>
-                      <details className="p-2 rounded hover:bg-slate-50">
-                        <summary className="cursor-pointer font-medium">How are digital solution payments calculated?</summary>
-                        <div className="mt-2 text-sm text-muted-foreground">Based on service contracts with Zemenay (e.g., website development, API integrations).</div>
+                      <details className="p-3 border rounded">
+                        <summary className="font-medium cursor-pointer">How can I view my transaction history?</summary>
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          Your transaction history is available in the 'Transactions' section of your profile. 
+                          You can filter transactions by date, type, or amount for easier tracking.
+                        </div>
                       </details>
-                      <details className="p-2 rounded hover:bg-slate-50">
-                        <summary className="cursor-pointer font-medium">How do I upgrade to Pro?</summary>
-                        <div className="mt-2 text-sm text-muted-foreground">Visit account settings or contact support for upgrade options.</div>
+                      <details className="p-3 border rounded">
+                        <summary className="font-medium cursor-pointer">What are the benefits of upgrading to Pro?</summary>
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          Pro members enjoy higher payout rates, priority support, and access to advanced analytics. 
+                          You can upgrade your account at any time from the 'Subscription' section.
+                        </div>
                       </details>
                     </div>
                   </div>
