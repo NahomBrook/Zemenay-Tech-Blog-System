@@ -78,15 +78,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   
-  // Custom pages
-  pages: {
-    signIn: '/auth/login',
-    signOut: '/auth/logout',
-    error: '/auth/error',
-    verifyRequest: '/auth/verify-request',
-    newUser: '/auth/register',
-  },
-  
   // Session configuration
   session: {
     strategy: 'jwt',
@@ -97,6 +88,15 @@ export const authOptions: NextAuthOptions = {
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
     maxAge: 60 * 60 * 24 * 30, // 30 days
+  },
+  
+  // Custom pages
+  pages: {
+    signIn: '/auth/login',
+    signOut: '/auth/logout',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify-request',
+    newUser: '/auth/register',
   },
   
   // Callbacks
@@ -126,7 +126,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // Handle OAuth sign in
       if (account?.provider !== 'credentials') {
         // Check if user exists in database
@@ -158,10 +158,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
   
-  // Enable debug in development
-  debug: process.env.NODE_ENV === 'development',
-  
   // Security options
+  debug: process.env.NODE_ENV === 'development',
   secret: process.env.NEXTAUTH_SECRET,
   useSecureCookies: process.env.NODE_ENV === 'production',
   cookies: {

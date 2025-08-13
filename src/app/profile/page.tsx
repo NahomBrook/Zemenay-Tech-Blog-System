@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
-import { useSession, signOut, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import React, { useMemo, useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -48,7 +47,6 @@ type Tx = { id: string; date: string; desc: string; amount: number; type: "credi
 
 export default function ProfileDashboard() {
   const { data: session } = useSession();
-  const router = useRouter();
 
   // Redirect to login if not authenticated
   /*
@@ -70,12 +68,11 @@ export default function ProfileDashboard() {
  
   // User data with session integration
   const [user, setUser] = useState({
-    name: session?.user?.name ?? "Nahom",
-    username: session?.user?.name ? session.user.name.split(" ").join("").toLowerCase() : "nahom91",
-    email: session?.user?.email ?? "nahom@example.com",
+    name: session?.user?.name ?? "Hello, User",
+    username: session?.user?.name ? session.user.name.split(" ").join("").toLowerCase() : "user",
     avatar: session?.user?.image ?? "/default-avatar.png",
     bio: "Full-stack dev building real stuff.",
-    status: "Pro", // Subscription tier: "Pro" | "Basic"
+    status: "Basic", // Subscription tier: "Pro" | "Basic"
     posts: { published: 24, drafts: 6 },
   });
 
@@ -325,7 +322,6 @@ export default function ProfileDashboard() {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h1 className="text-2xl font-bold">{user.name}</h1>
-                  <div className="text-sm text-muted-foreground">@{user.username} • {user.email}</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-sm text-muted-foreground">Subscription</div>
@@ -348,7 +344,6 @@ export default function ProfileDashboard() {
                           <div>
                             <div className="text-lg font-semibold">{user.name}</div>
                             <div className="text-xs text-muted-foreground">@{user.username}</div>
-                            <div className="text-sm text-muted-foreground mt-1">{user.email}</div>
                           </div>
                         </div>
                         <div className="mt-4 text-sm">

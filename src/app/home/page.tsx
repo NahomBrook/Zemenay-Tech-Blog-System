@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Calendar, Loader2, Search, TrendingUp, ThumbsUp, MessageSquare } from 'lucide-react';
+import { Clock, Calendar, Loader2, Search, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -12,9 +12,6 @@ interface Category {
   id: string;
   name: string;
   slug: string;
-  _count?: {
-    articles: number;
-  };
 }
 
 interface Article {
@@ -67,51 +64,132 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [homeData, setHomeData] = useState<HomeData | null>(null);
-  const [activeTab, setActiveTab] = useState<'latest' | 'liked' | 'commented'>('latest');
 
-  // Fetch home page data
+  // Sample data for latest posts
+  const sampleLatestPosts: Article[] = [
+    {
+      id: '1',
+      title: 'Getting Started with Next.js 14',
+      excerpt: 'Learn how to build modern web applications with Next.js 14 and React Server Components.',
+      content: 'Next.js 14 introduces several exciting features that make building React applications faster and more efficient than ever before. In this article, we\'ll explore the latest updates and how you can leverage them in your projects...',
+      slug: 'getting-started-with-nextjs-14',
+      coverImage: '/images/nextjs-blog.jpg',
+      published: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        name: 'John Doe',
+        email: 'john@example.com',
+        image: '/images/avatar-1.jpg'
+      },
+      categories: [
+        { id: '1', name: 'Web Development', slug: 'web-dev' },
+        { id: '2', name: 'React', slug: 'react' }
+      ],
+      tags: [
+        { id: '1', name: 'Next.js' },
+        { id: '2', name: 'React' },
+        { id: '3', name: 'JavaScript' }
+      ],
+      _count: {
+        comments: 5,
+        likes: 24
+      },
+      views: 150
+    },
+    {
+      id: '2',
+      title: 'Mastering TypeScript for React',
+      excerpt: 'A comprehensive guide to using TypeScript with React for type-safe applications.',
+      content: 'TypeScript has become the go-to choice for building large-scale React applications. In this guide, we\'ll cover advanced TypeScript patterns, type safety, and best practices for React development...',
+      slug: 'typescript-react-guide',
+      coverImage: '/images/typescript-react.jpg',
+      published: true,
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      author: {
+        id: '2',
+        name: 'Jane Smith',
+        email: 'jane@example.com',
+        image: '/images/avatar-2.jpg'
+      },
+      categories: [
+        { id: '3', name: 'TypeScript', slug: 'typescript' },
+        { id: '2', name: 'React', slug: 'react' }
+      ],
+      tags: [
+        { id: '4', name: 'TypeScript' },
+        { id: '5', name: 'Frontend' },
+        { id: '6', name: 'Development' }
+      ],
+      _count: {
+        comments: 8,
+        likes: 32
+      },
+      views: 210
+    },
+    {
+      id: '3',
+      title: 'The Future of Web Development',
+      excerpt: 'Exploring the latest trends and technologies shaping the future of web development.',
+      content: 'The web development landscape is constantly evolving. In this article, we\'ll look at emerging technologies like WebAssembly, Web Components, and the latest JavaScript features that are changing how we build for the web...',
+      slug: 'future-of-web-dev',
+      coverImage: '/images/web-dev-future.jpg',
+      published: true,
+      createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+      author: {
+        id: '3',
+        name: 'Alex Johnson',
+        email: 'alex@example.com'
+      },
+      categories: [
+        { id: '1', name: 'Web Development', slug: 'web-dev' },
+        { id: '4', name: 'Technology', slug: 'technology' }
+      ],
+      tags: [
+        { id: '7', name: 'Web' },
+        { id: '8', name: 'Trends' },
+        { id: '9', name: 'Future' }
+      ],
+      _count: {
+        comments: 12,
+        likes: 45
+      },
+      views: 320
+    }
+  ];
+
+  // Load sample data
   useEffect(() => {
-    const fetchHomeData = async () => {
+    const loadSampleData = () => {
       try {
         setIsLoading(true);
-        setError(null);
-        const response = await fetch('/api/home');
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch home data');
-        }
-        
-        const data = await response.json();
-        
-        // Transform the data to match our frontend expectations
-        const transformArticle = (article: any) => ({
-          ...article,
-          // If we have a category field, use it as categories array
-          categories: article.category ? [article.category] : article.categories || [],
-          // If we have a likes array, add a count
-          _count: {
-            ...article._count,
-            likes: article.likes?.length || article._count?.likes || 0,
-          },
-        });
-
-        const transformedData = {
-          featured: data.featured.map(transformArticle),
-          latest: data.latest.map(transformArticle),
-          popular: data.popular.map(transformArticle),
-          categories: data.categories,
+        const sampleData: HomeData = {
+          featured: [sampleLatestPosts[0]], // First post as featured
+          latest: sampleLatestPosts,
+          popular: [], // Not used anymore
+          categories: [
+            { id: '1', name: 'Web Development', slug: 'web-dev' },
+            { id: '2', name: 'React', slug: 'react' },
+            { id: '3', name: 'TypeScript', slug: 'typescript' },
+            { id: '4', name: 'Technology', slug: 'technology' },
+            { id: '5', name: 'JavaScript', slug: 'javascript' }
+          ]
         };
         
-        setHomeData(transformedData);
+        setHomeData(sampleData);
       } catch (err) {
-        console.error('Error fetching home data:', err);
-        setError('Failed to load data. Please try again later.');
+        console.error('Error loading sample data:', err);
+        setError('Failed to load sample data');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchHomeData();
+    loadSampleData();
   }, []);
 
   // Get data from home data if available
@@ -210,33 +288,15 @@ const HomePage = () => {
             </div>
           )}
 
-          {/* Tabbed Section */}
+          {/* Latest Posts Section */}
           <div className="mt-12">
-            <div className="flex items-center border-b border-border/30 pb-2">
-              {[
-                { id: 'latest', label: 'Latest Posts', icon: <TrendingUp className="h-4 w-4 text-blue-500" /> },
-                { id: 'liked', label: 'Most Liked', icon: <ThumbsUp className="h-4 w-4 text-rose-500" /> },
-                { id: 'commented', label: 'Most Commented', icon: <MessageSquare className="h-4 w-4 text-emerald-500" /> }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'latest' | 'liked' | 'commented')}
-                  className={`px-4 py-2 text-sm font-medium flex items-center gap-2 rounded-t-lg transition-colors ${
-                    activeTab === tab.id 
-                      ? 'text-primary border-b-2 border-primary' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <TrendingUp className="h-6 w-6 text-blue-500" />
+              Latest Posts
+            </h2>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {(activeTab === 'latest' ? homeData?.latest : 
-                activeTab === 'liked' ? homeData?.popular : 
-                homeData?.latest)?.map((article) => (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {homeData?.latest?.map((article) => (
                 <motion.article 
                   key={article.id}
                   whileHover={{ y: -4 }}
