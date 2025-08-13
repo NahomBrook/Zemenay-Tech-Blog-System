@@ -11,7 +11,6 @@ const isLoggedIn = true; //This should come from auth provider
 const navItems = [
   { name: 'Home', href: '/home' },
   { name: 'About', href: '/about' },
-  { name: 'Articles', href: '/articles' },
 ]
 
 export function Navbar() {

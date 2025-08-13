@@ -1,18 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Github, Loader2 } from 'lucide-react';
+import { authApi } from '@/lib/auth-api';
 import { toast } from 'sonner';
-import { useUser } from '@/lib/user-context';
-import { withGuest } from '@/lib/with-auth';
 
 const SignupPage = () => {
-  const { signup, isLoading: isAuthLoading } = useUser();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -74,13 +74,22 @@ const SignupPage = () => {
     setIsSubmitting(true);
     
     try {
-      await signup({
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim(),
+      const { user, token } = await authApi.signup({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
         password: formData.password,
       });
-      // No need to redirect here, the UserContext will handle it
+      
+      // Store the token in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', token);
+      }
+      
+      // Redirect to home page
+      router.push('/home');
+      router.refresh();
+      
     } catch (error) {
       console.error('Signup failed:', error);
       toast.error(error instanceof Error ? error.message : 'Signup failed. Please try again.');
@@ -217,4 +226,4 @@ const SignupPage = () => {
   );
 };
 
-export default withGuest(SignupPage, { redirectTo: '/home' });
+export default SignupPage;
