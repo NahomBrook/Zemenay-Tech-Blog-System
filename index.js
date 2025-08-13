@@ -19,7 +19,7 @@ const chapa = new Chapa({
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(morgan('dev')); // Logging requests
+app.use(morgan('dev'));
 
 // ===== Middleware for Admin Authentication =====
 function checkAdmin(req, res, next) {
@@ -64,6 +64,25 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ===== Posts Routes =====
+// Get all users
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
+    });
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+
 app.get('/api/posts', async (req, res) => {
   const posts = await prisma.post.findMany({
     include: { author: true, category: true, tags: true },
@@ -73,16 +92,10 @@ app.get('/api/posts', async (req, res) => {
 
 app.post('/api/posts', async (req, res) => {
   try {
-    const {
-      title, slug, content, excerpt, coverImage,
-      published = false, isFeatured = false,
-      authorId, categoryId, tagIds = []
-    } = req.body;
-
+    const { title, slug, content, excerpt, coverImage, published = false, isFeatured = false, authorId, categoryId, tagIds = [] } = req.body;
     if (!title || !content || !authorId) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-
     const post = await prisma.post.create({
       data: {
         title,
@@ -98,7 +111,6 @@ app.post('/api/posts', async (req, res) => {
       },
       include: { author: true, category: true, tags: true },
     });
-
     res.status(201).json(post);
   } catch (error) {
     console.error('Error creating post:', error);
@@ -109,34 +121,33 @@ app.post('/api/posts', async (req, res) => {
 // ===== Home Page Endpoint =====
 app.get('/api/home', async (req, res) => {
   try {
-    const [featured, latest, postsWithLikes, categories] = await Promise.all([
+    const [featured, latest, popularPosts, categories] = await Promise.all([
       prisma.post.findFirst({
         where: { published: true, isFeatured: true },
-        include: { author: true, category: true, tags: true, _count: { select: { comments: true, likes: true } } },
+        include: { author: true, category: true, tags: true },
         orderBy: { views: 'desc' },
       }),
       prisma.post.findMany({
         where: { published: true },
-        include: { author: true, category: true, tags: true, _count: { select: { comments: true, likes: true } } },
+        include: { author: true, category: true, tags: true },
         orderBy: { createdAt: 'desc' },
         take: 6,
       }),
       prisma.post.findMany({
         where: { published: true },
-        include: { author: true, category: true, tags: true, likes: true, _count: { select: { comments: true } } },
+        include: { author: true, category: true, tags: true },
         take: 6,
+        orderBy: { views: 'desc' },
       }),
       prisma.category.findMany({
         include: { _count: { select: { posts: true } } },
       }),
     ]);
 
-    const popular = [...postsWithLikes].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
-
     res.json({
       featured: featured ? [featured] : [],
       latest,
-      popular,
+      popular: popularPosts,
       categories,
     });
   } catch (error) {
@@ -145,7 +156,7 @@ app.get('/api/home', async (req, res) => {
   }
 });
 
-// ===== Plans API =====
+// ===== Plans & Payment Routes =====
 app.get('/api/plans', async (req, res) => {
   try {
     const plans = await prisma.plan.findMany();
@@ -159,34 +170,21 @@ app.get('/api/plans', async (req, res) => {
 app.post('/api/plans', async (req, res) => {
   try {
     const { name, price, description } = req.body;
-
-    if (!name || !price) {
-      return res.status(400).json({ error: 'Name and price are required' });
-    }
-
+    if (!name || !price) return res.status(400).json({ error: 'Name and price are required' });
     const existingPlan = await prisma.plan.findUnique({ where: { name } });
     if (existingPlan) return res.status(400).json({ error: 'Plan name already exists' });
-
-    const plan = await prisma.plan.create({
-      data: { name, price: parseFloat(price), description: description || '' },
-    });
-
+    const plan = await prisma.plan.create({ data: { name, price: parseFloat(price), description: description || '' } });
     res.json(plan);
-
   } catch (error) {
     console.error('Error creating plan:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// ===== Payment API =====
 app.post('/api/pay', async (req, res) => {
   try {
     const { userId, planId, amount, email, firstName, lastName } = req.body;
-    if (!userId || !planId || !amount || !email) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
+    if (!userId || !planId || !amount || !email) return res.status(400).json({ error: 'Missing required fields' });
     const plan = await prisma.plan.findUnique({ where: { id: planId } });
     if (!plan) return res.status(404).json({ error: 'Plan not found' });
 
@@ -205,13 +203,7 @@ app.post('/api/pay', async (req, res) => {
     const response = await chapa.initialize(paymentData);
     if (response.status) {
       await prisma.payment.create({
-        data: {
-          userId,
-          planId,
-          amount,
-          status: 'pending',
-          transactionId: response.data.tx_ref,
-        },
+        data: { userId, planId, amount, status: 'pending', transactionId: response.data.tx_ref },
       });
       res.json({ checkout_url: response.data.checkout_url });
     } else {
@@ -227,13 +219,7 @@ app.post('/api/pay', async (req, res) => {
 app.get('/api/admin/users', checkAdmin, async (req, res) => {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        password: false, // never send passwords
-      }
+      select: { id: true, firstName: true, lastName: true, email: true },
     });
     res.json(users);
   } catch (error) {
@@ -244,7 +230,7 @@ app.get('/api/admin/users', checkAdmin, async (req, res) => {
 
 app.delete('/api/admin/posts/:id', checkAdmin, async (req, res) => {
   try {
-    const postId = parseInt(req.params.id);
+    const postId = req.params.id;
     const post = await prisma.post.delete({ where: { id: postId } });
     res.json({ message: 'Post deleted', post });
   } catch (error) {
