@@ -17,189 +17,20 @@ const chapa = new Chapa({
 });
 
 app.use(helmet());
-
-// Configure CORS with specific options
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-production-domain.com'] 
-    : ['http://localhost:3000', 'http://localhost:3001'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
-
-// Parse JSON bodies
+app.use(cors());
 app.use(express.json());
-
-// Log all requests
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  next();
-});
 app.use(morgan('dev')); // Logging requests
 
-// ===== Authentication Middleware =====
-const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-    
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
-      
-      req.user = user;
-      next();
-    });
-  } else {
-    res.sendStatus(401);
-  }
-};
-
 // ===== Middleware for Admin Authentication =====
-const checkAdmin = [
-  authenticateJWT,
-  (req, res, next) => {
-    if (req.user && req.user.role === 'ADMIN') {
-      return next();
-    }
-    return res.status(403).json({ error: 'Access denied: Admins only' });
+function checkAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader === 'Bearer admin') {
+    return next();
   }
-];
+  return res.status(403).json({ error: 'Access denied: Admins only' });
+}
 
 // ===== User Routes =====
-app.post('/api/login', async (req, res) => {
-  console.log('Login request received:', { email: req.body.email });
-  
-  try {
-    const { email, password } = req.body;
-    
-    // Validate input
-    if (!email || !password) {
-      console.log('Missing email or password');
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-    
-    // Find user by email
-    const user = await prisma.user.findUnique({ 
-      where: { email },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        password: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    });
-    
-    // Check if user exists
-    if (!user) {
-      console.log('User not found');
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-    
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      console.log('Invalid password');
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-    
-    // Create JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email, 
-        role: user.role 
-      },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
-    );
-    
-    // Remove password from user object
-    const { password: _, ...userWithoutPassword } = user;
-    
-    console.log('Login successful for user:', user.email);
-    
-    // Send response with token and user data
-    res.json({ 
-      message: 'Login successful',
-      user: userWithoutPassword,
-      token
-    });
-    
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ 
-      error: 'An error occurred during login',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-app.post('/api/register', async (req, res) => {
-  try {
-    const { firstName, lastName, email, password } = req.body;
-    
-    // Validate input
-    if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-    
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email already in use' });
-    }
-    
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword,
-        role: 'USER' // Default role
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        role: true
-      }
-    });
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    
-    res.status(201).json({
-      message: 'User registered successfully',
-      user,
-      token
-    });
-    
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Failed to create user' });
-  }
-});
-
 app.post('/api/users', async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
@@ -217,42 +48,12 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-import jwt from 'jsonwebtoken';
-
-// Add this to your environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await prisma.user.findUnique({ 
-      where: { email },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        password: true,
-        role: true
-      }
-    });
-    
+    const user = await prisma.user.findUnique({ where: { email } });
     if (user && await bcrypt.compare(password, user.password)) {
-      // Create token
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-      
-      // Remove password from user object before sending
-      const { password: _, ...userWithoutPassword } = user;
-      
-      res.json({ 
-        message: 'Login successful', 
-        user: userWithoutPassword,
-        token 
-      });
+      res.json({ message: 'Login successful', user });
     } else {
       res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -419,123 +220,6 @@ app.post('/api/pay', async (req, res) => {
   } catch (error) {
     console.error('Error initiating payment:', error);
     res.status(500).json({ error: 'Failed to initiate payment' });
-  }
-});
-
-// ===== User Profile Routes =====
-app.get('/api/users/me', checkAuth, async (req, res) => {
-  try {
-    // Get user ID from the authenticated session
-    const userId = req.userId;
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        avatar: true,
-        bio: true,
-        role: true
-      }
-    });
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.json(user);
-  } catch (error) {
-    console.error('Error fetching user profile:', error);
-    res.status(500).json({ error: 'Failed to fetch user profile' });
-  }
-});
-
-app.put('/api/users/me', checkAuth, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const { firstName, lastName, email, bio, avatar } = req.body;
-    
-    // Basic validation
-    if (!firstName || !lastName || !email) {
-      return res.status(400).json({ error: 'First name, last name, and email are required' });
-    }
-    
-    // Check if email is already taken by another user
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        email,
-        NOT: { id: userId }
-      }
-    });
-    
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email is already in use' });
-    }
-    
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        firstName,
-        lastName,
-        email,
-        bio: bio || null,
-        avatar: avatar || null
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        avatar: true,
-        bio: true,
-        role: true
-      }
-    });
-    
-    res.json({ message: 'Profile updated successfully', user: updatedUser });
-  } catch (error) {
-    console.error('Error updating user profile:', error);
-    res.status(500).json({ error: 'Failed to update profile' });
-  }
-});
-
-app.put('/api/users/me/password', checkAuth, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const { currentPassword, newPassword } = req.body;
-    
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: 'Current password and new password are required' });
-    }
-    
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'New password must be at least 6 characters long' });
-    }
-    
-    // Get the user
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    // Verify current password
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Current password is incorrect' });
-    }
-    
-    // Hash and update the new password
-    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
-    await prisma.user.update({
-      where: { id: userId },
-      data: { password: hashedPassword }
-    });
-    
-    res.json({ message: 'Password updated successfully' });
-  } catch (error) {
-    console.error('Error updating password:', error);
-    res.status(500).json({ error: 'Failed to update password' });
   }
 });
 
