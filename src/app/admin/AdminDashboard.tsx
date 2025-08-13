@@ -815,45 +815,102 @@ export default function AdminDashboard() {
 
   // Main dashboard
   return (
-    <main className="min-h-screen flex bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <div className="px-6 py-4">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="max-w-lg border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-slate-900 shadow-md hover:shadow-xl transition-shadow"
+    <main className="min-h-screen bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100">
+      <div className="flex flex-col md:flex-row">
+        {/* Sidebar */}
+        <motion.nav
+          initial={{ x: -300, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full md:w-64 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-gray-700 p-6 flex-shrink-0"
+        >
+          <h1 className="text-2xl font-bold mb-8 text-gray-900 dark:text-gray-100">
+            Zemenay Admin
+          </h1>
+          <nav className="flex flex-col space-y-3 text-gray-700 dark:text-gray-300 text-sm">
+            {[
+              { name: "Overview", id: "overview", icon: Database },
+              { name: "Profile", id: "profile", icon: User },
+              { name: "Analytics", id: "analytics", icon: BarChart2 },
+              { name: "AI Chatbot", id: "chatbot", icon: MessageCircle },
+              { name: "Updates", id: "updates", icon: Bell },
+              { name: "Users", id: "users", icon: User },
+              { name: "To-Do List", id: "todo", icon: ListCheck },
+            ].map(({ name, id, icon: Icon }) => (
+              <motion.button
+                key={id}
+                onClick={() => setView(id as View)}
+                className={`flex items-center space-x-3 px-4 py-2 rounded-lg transition-colors ${
+                  view === id
+                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100"
+                    : "hover:bg-gray-100 dark:hover:bg-slate-700"
+                }`}
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
+              >
+                <Icon className="h-4 w-4" />
+                <span>{name}</span>
+              </motion.button>
+            ))}
+          </nav>
+          <motion.div 
+            variants={buttonVariants} 
+            whileHover="hover" 
+            whileTap="tap"
+            className="mt-8"
           >
-            <Input
-              type="search"
-              placeholder="Search admin panel..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent border-none focus:ring-0 shadow-sm"
-            />
-          </motion.div>
-        </div>
-        <section className="container mx-auto p-6 max-w-7xl flex-grow overflow-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={view}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="min-h-[60vh]"
+            <Button
+              variant="destructive"
+              onClick={() => setIsLoggedIn(false)}
+              className="w-full shadow-md"
             >
-              {view === "overview" && <Overview />}
-              {view === "profile" && <Profile />}
-              {view === "analytics" && <Analytics />}
-              {view === "chatbot" && <Chatbot />}
-              {view === "updates" && <Updates />}
-              {view === "users" && <Users />}
-              {view === "todo" && <ToDo />}
+              <LogOut className="h-4 w-4 mr-2" />
+              Log Out
+            </Button>
+          </motion.div>
+        </motion.nav>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-h-screen">
+          <div className="p-6">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="max-w-lg border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-slate-800 shadow-md hover:shadow-xl transition-shadow"
+            >
+              <Input
+                type="search"
+                placeholder="Search admin panel..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-transparent border-none focus:ring-0 shadow-sm"
+              />
             </motion.div>
-          </AnimatePresence>
-        </section>
+          </div>
+          
+          <section className="px-6 pb-6 flex-1 overflow-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={view}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="min-h-[60vh]"
+              >
+                {view === "overview" && <Overview />}
+                {view === "profile" && <Profile />}
+                {view === "analytics" && <Analytics />}
+                {view === "chatbot" && <Chatbot />}
+                {view === "updates" && <Updates />}
+                {view === "users" && <Users />}
+                {view === "todo" && <ToDo />}
+              </motion.div>
+            </AnimatePresence>
+          </section>
+        </div>
       </div>
     </main>
   );

@@ -33,11 +33,13 @@ interface Article {
     email: string;
     image?: string;
   };
-  categories: Category[];
+  category?: Category;
+  categories?: Category[];
   tags: { id: string; name: string }[];
+  likes?: any[];
   _count?: {
     comments: number;
-    likes: number;
+    likes?: number;
   };
   isPinned?: boolean;
   isFeatured?: boolean;
@@ -80,7 +82,27 @@ const HomePage = () => {
         }
         
         const data = await response.json();
-        setHomeData(data);
+        
+        // Transform the data to match our frontend expectations
+        const transformArticle = (article: any) => ({
+          ...article,
+          // If we have a category field, use it as categories array
+          categories: article.category ? [article.category] : article.categories || [],
+          // If we have a likes array, add a count
+          _count: {
+            ...article._count,
+            likes: article.likes?.length || article._count?.likes || 0,
+          },
+        });
+
+        const transformedData = {
+          featured: data.featured.map(transformArticle),
+          latest: data.latest.map(transformArticle),
+          popular: data.popular.map(transformArticle),
+          categories: data.categories,
+        };
+        
+        setHomeData(transformedData);
       } catch (err) {
         console.error('Error fetching home data:', err);
         setError('Failed to load data. Please try again later.');

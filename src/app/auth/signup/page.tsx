@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Github, UserPlus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Github, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useUser } from '@/lib/user-context';
+import { withGuest } from '@/lib/with-auth';
 
 const SignupPage = () => {
-  const router = useRouter();
+  const { signup, isLoading: isAuthLoading } = useUser();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -63,7 +64,7 @@ const SignupPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -72,12 +73,20 @@ const SignupPage = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Form submitted:', formData);
+    try {
+      await signup({
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      });
+      // No need to redirect here, the UserContext will handle it
+    } catch (error) {
+      console.error('Signup failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Signup failed. Please try again.');
+    } finally {
       setIsSubmitting(false);
-      router.push('/home');
-    }, 1000);
+    }
   };
   
   return (
@@ -163,8 +172,14 @@ const SignupPage = () => {
               className="w-full"
               disabled={isSubmitting}
             >
-              <UserPlus className={cn('mr-2 h-4 w-4', isSubmitting && 'animate-spin')} />
-              {isSubmitting ? 'Creating account...' : 'Create account'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                'Create account'
+              )}
             </Button>
           </div>
 
@@ -202,4 +217,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default withGuest(SignupPage, { redirectTo: '/home' });

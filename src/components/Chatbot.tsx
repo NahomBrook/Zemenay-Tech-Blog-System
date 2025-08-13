@@ -183,8 +183,7 @@ export function Chatbot({
           </Button>
         </form>
         <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
-          For specific inquiries, please use our{' '}
-          <a href="/contact" className="text-green-600 hover:underline">Contact Page</a>
+          For specific inquiries, please use our Contact Page
         </p>
       </div>
     </div>
