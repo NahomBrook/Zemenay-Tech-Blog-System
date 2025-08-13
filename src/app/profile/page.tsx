@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { User, Save, Loader2, BarChart2, LogOut, Edit3, Wallet } from "lucide-react";
+import { User, Save, Loader2, BarChart2, LogOut, Edit3, Wallet, Shield } from "lucide-react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement } from "chart.js";
 import { Pie, Line, Bar } from "react-chartjs-2";
 import type { ChartOptions } from 'chart.js';
@@ -292,6 +292,13 @@ export default function ProfileDashboard() {
             >
               <BarChart2 className="h-4 w-4" /> Analytics
             </button>
+
+            <a
+              href="/admin"
+              className="flex items-center gap-2 px-3 py-2 rounded hover:bg-primary/5 text-amber-600"
+            >
+              <Shield className="h-4 w-4" /> Admin Dashboard
+            </a>
 
             <button
               onClick={() => signOut({ callbackUrl: "/" })}

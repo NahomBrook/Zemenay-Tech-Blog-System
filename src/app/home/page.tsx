@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Calendar, Loader2, Search, TrendingUp, ThumbsUp, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Clock, Calendar, Search, TrendingUp, ThumbsUp, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -47,31 +46,90 @@ const fadeIn = {
 };
 
 const HomePage = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [homeData, setHomeData] = useState<HomeData | null>(null);
   const [activeTab, setActiveTab] = useState<'latest' | 'liked' | 'commented'>('latest');
 
-  useEffect(() => {
-    const fetchHomeData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await fetch('http://localhost:3000/api/home', { cache: 'no-store' }); // Force fresh data
-        if (!response.ok) throw new Error('Failed to fetch home data');
-        const data = await response.json();
-        setHomeData(data);
-      } catch (err) {
-        console.error('Error fetching home data:', err);
-        setError('Failed to load data. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchHomeData();
-  }, []);
+  // Sample data
+  const sampleAuthor = {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    image: 'https://randomuser.me/api/portraits/men/1.jpg'
+  };
 
-  const featuredPost = homeData?.featured[0];
+  const sampleCategories: Category[] = [
+    { id: '1', name: 'Technology', slug: 'technology' },
+    { id: '2', name: 'Programming', slug: 'programming' },
+    { id: '3', name: 'Web Development', slug: 'web-development' },
+  ];
+
+  const sampleTags = [
+    { id: '1', name: 'React' },
+    { id: '2', name: 'Next.js' },
+    { id: '3', name: 'TypeScript' },
+    { id: '4', name: 'Tailwind' },
+  ];
+
+  const sampleArticles: Article[] = [
+    {
+      id: '1',
+      title: 'Getting Started with Next.js 14',
+      excerpt: 'Learn the basics of Next.js 14 and how to build modern web applications.',
+      content: 'This is a detailed article about Next.js 14...',
+      slug: 'getting-started-with-nextjs-14',
+      coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+      published: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: sampleAuthor,
+      categories: [sampleCategories[0], sampleCategories[1]],
+      tags: [sampleTags[0], sampleTags[1]],
+      _count: { comments: 12, likes: 45 },
+      isPinned: true,
+      isFeatured: true,
+      views: 1024
+    },
+    {
+      id: '2',
+      title: 'Mastering TypeScript in 2023',
+      excerpt: 'Advanced TypeScript patterns and best practices for modern web development.',
+      content: 'TypeScript has become an essential tool for web developers...',
+      slug: 'mastering-typescript-2023',
+      coverImage: 'https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+      published: true,
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000).toISOString(),
+      author: sampleAuthor,
+      categories: [sampleCategories[1]],
+      tags: [sampleTags[2]],
+      _count: { comments: 8, likes: 32 },
+      views: 756
+    },
+    {
+      id: '3',
+      title: 'Building Responsive UIs with Tailwind CSS',
+      excerpt: 'Create beautiful, responsive user interfaces with Tailwind CSS.',
+      content: 'Tailwind CSS has revolutionized the way we build user interfaces...',
+      slug: 'responsive-uis-tailwind-css',
+      coverImage: 'https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+      published: true,
+      createdAt: new Date(Date.now() - 172800000).toISOString(),
+      updatedAt: new Date(Date.now() - 172800000).toISOString(),
+      author: sampleAuthor,
+      categories: [sampleCategories[2]],
+      tags: [sampleTags[3]],
+      _count: { comments: 5, likes: 28 },
+      views: 623
+    }
+  ];
+
+  const homeData: HomeData = {
+    featured: [sampleArticles[0]],
+    latest: [...sampleArticles],
+    popular: [...sampleArticles].sort((a, b) => (b._count?.likes || 0) - (a._count?.likes || 0)),
+    categories: sampleCategories
+  };
+
+  const featuredPost = homeData.featured[0];
   const formatDate = (dateString: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(dateString));
   const calculateReadTime = (content: string) => {
     const wordsPerMinute = 200;
@@ -82,17 +140,17 @@ const HomePage = () => {
   const getTabData = () => {
     switch (activeTab) {
       case 'latest':
-        return homeData?.latest;
+        return homeData.latest;
       case 'liked':
-        return homeData?.popular;
+        return homeData.popular;
       case 'commented':
-        return homeData?.latest.sort((a, b) => (b._count?.comments || 0) - (a._count?.comments || 0));
+        return homeData.latest.sort((a, b) => (b._count?.comments || 0) - (a._count?.comments || 0));
       default:
-        return homeData?.latest;
+        return homeData.latest;
     }
   };
 
-  const popularTags = homeData?.latest.flatMap((article) => article.tags).reduce((acc, tag) => {
+  const popularTags = homeData.latest.flatMap((article) => article.tags).reduce((acc, tag) => {
     acc[tag.name] = (acc[tag.name] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -101,19 +159,7 @@ const HomePage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
-          {isLoading ? (
-            <div className="relative rounded-2xl overflow-hidden bg-muted/30 h-[500px] flex items-center justify-center">
-              <div className="text-center space-y-4 p-8">
-                <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary" />
-                <p className="text-muted-foreground">Loading featured content...</p>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-6 text-center">
-              <p className="text-destructive">{error}</p>
-              <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
-            </div>
-          ) : featuredPost ? (
+          {featuredPost ? (
             <motion.article variants={fadeIn} className="relative rounded-2xl overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
               <img

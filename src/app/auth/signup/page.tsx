@@ -16,10 +16,9 @@ const SignupPage = () => {
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
+    password: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateEmail = (email: string) => {
@@ -29,63 +28,66 @@ const SignupPage = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!validateEmail(formData.email)) newErrors.email = 'Please enter a valid email address';
-    if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+    
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [id === 'first-name' ? 'firstName' : id === 'last-name' ? 'lastName' : id]: value,
+      [id === 'first-name' ? 'firstName' : 
+        id === 'last-name' ? 'lastName' : 
+        id]: value
     }));
-    setServerError(null); // Clear server error on change
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-    setServerError(null);
-
-    try {
-      const response = await fetch('http://localhost:3000/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.error || 'Signup failed');
-
-      // Success - show message or redirect
-      alert('Account created successfully! Redirecting to home...');
-      router.push('/home');
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'An error occurred during signup';
-      setServerError(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+    
+    if (!validateForm()) {
+      return;
     }
+    
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      console.log('Form submitted:', formData);
+      setIsSubmitting(false);
+      router.push('/home');
+    }, 1000);
   };
-
+  
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-start justify-center bg-background pt-8 px-4 pb-8">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Enter your details to get started</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Enter your details to get started
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 bg-card p-8 rounded-lg border border-border shadow-sm">
@@ -101,7 +103,9 @@ const SignupPage = () => {
                   onChange={handleChange}
                   className={errors.firstName ? 'border-destructive' : ''}
                 />
-                {errors.firstName && <p className="text-sm text-destructive">{errors.firstName}</p>}
+                {errors.firstName && (
+                  <p className="text-sm text-destructive">{errors.firstName}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="last-name">Last name</Label>
@@ -113,7 +117,9 @@ const SignupPage = () => {
                   onChange={handleChange}
                   className={errors.lastName ? 'border-destructive' : ''}
                 />
-                {errors.lastName && <p className="text-sm text-destructive">{errors.lastName}</p>}
+                {errors.lastName && (
+                  <p className="text-sm text-destructive">{errors.lastName}</p>
+                )}
               </div>
             </div>
             <div className="space-y-2">
@@ -129,7 +135,9 @@ const SignupPage = () => {
                 onChange={handleChange}
                 className={errors.email ? 'border-destructive' : ''}
               />
-              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -145,14 +153,19 @@ const SignupPage = () => {
               {errors.password ? (
                 <p className="text-sm text-destructive">{errors.password}</p>
               ) : (
-                <p className="text-xs text-muted-foreground">Use 8 or more characters with a mix of letters, numbers & symbols</p>
+                <p className="text-xs text-muted-foreground">
+                  Use 8 or more characters with a mix of letters, numbers & symbols
+                </p>
               )}
             </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isSubmitting}
+            >
               <UserPlus className={cn('mr-2 h-4 w-4', isSubmitting && 'animate-spin')} />
               {isSubmitting ? 'Creating account...' : 'Create account'}
             </Button>
-            {serverError && <p className="text-sm text-destructive">{serverError}</p>}
           </div>
 
           <div className="relative">
@@ -160,12 +173,14 @@ const SignupPage = () => {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-card px-2 text-muted-foreground">
+                Or continue with
+              </span>
             </div>
           </div>
 
           <div className="grid gap-4">
-            <Button variant="outline" type="button" disabled>
+            <Button variant="outline" type="button">
               <Github className="mr-2 h-4 w-4" />
               GitHub
             </Button>
@@ -174,7 +189,11 @@ const SignupPage = () => {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/auth/login" className="font-medium text-primary hover:underline" onClick={(e) => isSubmitting && e.preventDefault()}>
+          <Link
+            href="/auth/login"
+            className="font-medium text-primary hover:underline"
+            onClick={(e) => isSubmitting && e.preventDefault()}
+          >
             Sign in
           </Link>
         </p>

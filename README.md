@@ -2,7 +2,7 @@
 
 A modern, full-featured tech blog platform built with Next.js, TypeScript, and Prisma. This project provides a complete solution for publishing technical articles, managing content, and engaging with readers.
 
-## 🚀 Features
+## Features
 
 - **Modern Stack**: Built with Next.js 14, TypeScript, and Tailwind CSS
 - **Authentication**: Email/Password, Google OAuth, and GitHub OAuth support
@@ -12,7 +12,7 @@ A modern, full-featured tech blog platform built with Next.js, TypeScript, and P
 - **Admin Dashboard**: Manage posts, users, and site settings
 - **Comments & Reactions**: Engage with readers through comments and reactions
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
 - **Backend**: Next.js API Routes
@@ -21,7 +21,7 @@ A modern, full-featured tech blog platform built with Next.js, TypeScript, and P
 - **UI Components**: Shadcn/ui
 - **Deployment**: Vercel (recommended)
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -109,30 +109,14 @@ npm test
 yarn test
 ```
 
-## 🚀 Deployment
-
-### Vercel
-
-1. Push your code to a GitHub repository
-2. Import the repository on Vercel
-3. Add your environment variables
-4. Deploy!
-
 ### Other Platforms
 
 This project can be deployed to any platform that supports Node.js applications. Make sure to set up the required environment variables in your hosting platform.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) to get started.
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [NextAuth.js Documentation](https://next-auth.js.org/)
+## Message
+ - We have finished the frontend, as well as the backend and the database but we had some issues with the integration of the api routes at the last minute.
